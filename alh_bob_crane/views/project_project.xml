@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_project_form_inherited_bob_crane" model="ir.ui.view">
+        <field name="name">project.project.form.inherit.bob.crane</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+             <xpath expr="//field[@name='partner_id']" position="after">
+                  <field name="inspection_project" invisible="1"/>
+                  <field name="is_assign_hse" invisible="1"/>
+                  <field name="is_assign_transport" invisible="1"/>
+                  <field name="sale_order_job" invisible="inspection_project == True" readonly="1"/>
+                  <field name="crm_lead_id" invisible="inspection_project == True" readonly="1"/>
+                  <field name="project_value" invisible="inspection_project == True" readonly="1" groups="alh_bob_crane.group_finance_manaager_admin"/>
+                  <field name="project_loc" invisible="inspection_project == True" readonly="1"/>
+             </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_hse"
+                                type="object"
+                                string="Generate Hse"
+                                class="btn btn-primary"
+                                invisible="is_assign_hse == True"
+                                groups="alh_bob_crane.group_hse_group_manager"
+                />
+              <button name="action_generate_transport"
+                        type="object"
+                        string="Generate Transport"
+                        class="btn btn-primary"
+                      invisible="is_assign_transport == True"
+                        groups="alh_bob_crane.group_transport_group_manager"
+                />
+
+                 <button name="action_loading_equipments"
+                        type="object"
+                        string="Create Loadings"
+                        class="btn btn-primary"
+                        groups="alh_bob_crane.group_loading_group_manager"
+                />
+            </xpath>
+
+              <xpath expr="//page[@name='description']" position="after">
+                   <page name="equipment_allocation_page" string="Equipments Allocation">
+                        <field name="equipment_allocation_ids" widget="one2many">
+                            <list string="Equipments" editable="bottom" delete="1">
+                                <field name="project_id" column_invisible="1"/>
+                                <field name="equipment_id"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="qty" column_invisible="1"/>
+                                <field name="loading_status" readonly="1"/>
+                                <field name="is_loading" column_invisible="1"/>
+                                <field name="is_unloaded" column_invisible="1"/>
+                            </list>
+                        </field>
+                   </page>
+                  <page name="manpower_allocation_page" string="Manpower Allocation">
+                        <field name="manpower_allocation_ids" widget="one2many">
+                            <list string="Manpower" editable="bottom">
+                                <field name="project_id" column_invisible="1"/>
+                                <field name="job_id"/>
+                                <field name="employee_id"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="qty" column_invisible="1"/>
+                            </list>
+                        </field>
+                  </page>
+                  <page name="invoice_allocation" string="Invoicing" groups="alh_bob_crane.group_finance_manaager_admin">
+                      <group>
+                          <group>
+                            <field name="is_schedule" invisible="1"/>
+                            <field name="fixed_schedule" readonly="is_schedule == True"/>
+                            <field name="start_inv_date" invisible="fixed_schedule == False"  readonly="is_schedule == True"/>
+                            <field name="end_inv_date"  invisible="fixed_schedule == False"  readonly="is_schedule == True"/>
+                            <field name="period"  invisible="fixed_schedule == False"  readonly="is_schedule == True"/>
+                            <field name="date_fixed"  invisible="fixed_schedule == True"/>
+                            <field name="amount_to_inv" />
+                            <field name="description_inv"  invisible="fixed_schedule == True"/>
+                          </group>
+                      </group>
+                      <button name="action_schedule_invoice"
+                                    type="object"
+                                    string="Schedule Invoice"
+                                    class="btn-primary btn-info"
+                                    invisible="is_schedule == True or fixed_schedule == False"
+                                    />
+                      <button name="action_create_inv"
+                                    type="object"
+                                    string="Create Invoice"
+                                    class="btn-primary btn-info"
+                                    invisible="fixed_schedule == True"
+                                    />
+                      <field name="invoice_allocation_ids" widget="one2many">
+                            <list string="Invoices" editable="bottom">
+                                <field name="project_id" column_invisible="1"/>
+                                <field name="date_inv"/>
+                                <field name="amount"/>
+                                <field name="invoice_id" readonly="1"/>
+                                <field name="invoice_state" readonly="1"/>
+                                <field name="invoice_status" readonly="1"/>
+                                <field name="is_invoiced" column_invisible="1"/>
+                                <button name="action_invoice_create"
+                                            type="object"
+                                            string="Create Invoice"
+                                            class="btn-primary btn-info"
+                                            invisible="is_invoiced == True"
+                                    />
+                            </list>
+                        </field>
+                  </page>
+              </xpath>
+
+               <xpath expr="//button[@name='action_view_tasks']" position="after">
+                <button name="action_open_planning" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                string="Planning">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Planning</span>
+                            </div>
+                        </button>
+                   <button name="action_open_hse_task" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                string="Planning">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">HSE</span>
+                            </div>
+                   </button>
+
+                    <button name="action_open_transportation_task" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                string="Transportation">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Transportation</span>
+                            </div>
+                   </button>
+
+                   <button name="action_open_loading_task" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                string="Loading">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Loading Work</span>
+                            </div>
+                   </button>
+            </xpath>
+        </field>
+    </record>
+
+      <record id="view_equipment_planning_form" model="ir.ui.view">
+        <field name="name">equipment.planning.form</field>
+        <field name="model">project.operations.equipment.line</field>
+        <field name="arch" type="xml">
+            <form string="Equipment Planning">
+                <sheet>
+                    <group>
+                        <field name="project_id"/>
+                        <field name="equipment_id"/>
+                        <field name="qty"/>
+                    </group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_equipment_planning_tree" model="ir.ui.view">
+        <field name="name">equipment.planning.tree</field>
+        <field name="model">project.operations.equipment.line</field>
+        <field name="arch" type="xml">
+            <list string="Equipment Planning" default_order="start_date">
+                <field name="planning_id"/>
+                <field name="project_id"/>
+                <field name="equipment_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="qty"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="view_manpower_planning_form" model="ir.ui.view">
+    <field name="name">manpower.planning.form</field>
+    <field name="model">project.operations.manpower.line</field>
+    <field name="arch" type="xml">
+        <form string="Manpower Planning">
+            <sheet>
+                <group>
+                    <field name="project_id"/>
+                    <field name="job_id"/>
+                     <field name="qty"/>
+                </group>
+                <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+
+    <record id="view_manpower_planning_tree" model="ir.ui.view">
+    <field name="name">manpower.planning.tree</field>
+    <field name="model">project.operations.manpower.line</field>
+    <field name="arch" type="xml">
+        <list string="Manpower Planning" default_order="start_date">
+            <field name="planning_id"/>
+            <field name="project_id"/>
+            <field name="job_id"/>
+            <field name="start_date"/>
+            <field name="end_date"/>
+            <field name="qty"/>
+        </list>
+    </field>
+</record>
+
+    <record id="view_equipment_planning_gantt" model="ir.ui.view">
+    <field name="name">equipment.planning.gantt</field>
+    <field name="model">project.operations.equipment.line</field>
+        <field name="arch" type="xml">
+            <gantt
+                date_start="start_date"
+                date_stop="end_date"
+                string="Equipment Planning"
+                default_group_by="project_id">
+                <field name="equipment_id"/>
+            </gantt>
+        </field>
+    </record>
+
+    <record id="view_manpower_planning_gantt" model="ir.ui.view">
+    <field name="name">manpower.planning.gantt</field>
+    <field name="model">project.operations.manpower.line</field>
+        <field name="arch" type="xml">
+            <gantt
+                date_start="start_date"
+                date_stop="end_date"
+                string="Manpower Planning" default_group_by="project_id">
+                <field name="job_id"/>
+            </gantt>
+        </field>
+  </record>
+
+    <record id="view_form_project_operations_planning" model="ir.ui.view">
+        <field name="name">project.operations.planning.form.view</field>
+        <field name="model">project.operations.planning</field>
+        <field name="arch" type="xml">
+            <form string="Operation Planning">
+                <header>
+                    <field name="state" widget="statusbar" readonly="1"/>
+                     <button name="action_in_progress"
+                            type="object"
+                            string="In Progress"
+                            class="btn btn-primary"
+                            invisible="state != 'draft'"
+                    />
+                    <button name="action_completed"
+                            type="object"
+                            string="Completed"
+                            class="btn btn-primary"
+                            invisible="state != 'confirmed'"
+                    />
+
+                </header>
+                <sheet>
+                    <label for="name"/>
+                    <h1>
+                        <field name="name" readonly="state == 'done'"/>
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="project_id" readonly="state == 'done'"/>
+                            <field name="user_id" readonly="state == 'done'"/>
+                        </group>
+                        <group>
+                             <field name="start_date" readonly="state == 'done'"/>
+                            <field name="end_date" readonly="state == 'done'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="equipment_line_ids_page" string="Equipments">
+                            <field name="equipment_line_ids" widget="one2many" readonly="state == 'done'">
+                                <list string="Equipments" editable="bottom">
+                                    <field name="planning_id" column_invisible="1"/>
+                                    <field name="project_id" column_invisible="1"/>
+                                    <field name="equipment_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="qty"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="manpower_line_ids_page" string="Manpower">
+                            <field name="manpower_line_ids" widget="one2many" readonly="state == 'done'">
+                                <list string="Manpower" editable="bottom">
+                                    <field name="planning_id" column_invisible="1"/>
+                                    <field name="project_id" column_invisible="1"/>
+                                    <field name="job_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="qty"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_project_operations_planning" model="ir.ui.view">
+        <field name="name">project.operations.planning.tree.view</field>
+        <field name="model">project.operations.planning</field>
+        <field name="arch" type="xml">
+            <list string="Inspection Team" create="1" delete="1">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_equipment_planning" model="ir.actions.act_window">
+            <field name="name">Equipment Planning</field>
+            <field name="res_model">project.operations.equipment.line</field>
+            <field name="view_mode">gantt,list,form</field>
+        </record>
+
+        <record id="action_manpower_planning" model="ir.actions.act_window">
+            <field name="name">Manpower Planning</field>
+            <field name="res_model">project.operations.manpower.line</field>
+            <field name="view_mode">gantt,list,form</field>
+        </record>
+
+
+
+
+     <record id="action_project_planning_equipment_manpower" model="ir.actions.act_window">
+        <field name="name">Operation Planning</field>
+        <field name="res_model">project.operations.planning</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_tree_project_operations_planning"/>
+        <field name="help" type="html">
+            <p>
+                Create and manage your Operation Planning
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+            name="Operation Planning"
+            id="menu_opertaion_planning"
+            active="True"
+             web_icon="alh_bob_crane,static/description/iconp.png"
+            groups="alh_bob_crane.group_operations_planning_manager,alh_bob_crane.group_operations_planning_user"
+            sequence="20">
+
+        <menuitem
+                name="Operation Planning"
+                id="menu_opertaion_planning_child"
+                action="action_project_planning_equipment_manpower"
+                sequence="10"
+        />
+
+         <menuitem
+                name="Equipment Planning"
+                id="menu_equipment_planning"
+                action="action_equipment_planning"
+                sequence="15"
+        />
+         <menuitem
+                name="Manpower Planning"
+                id="menu_manpower_planning"
+                action="action_manpower_planning"
+                sequence="16"
+        />
+    </menuitem>
+
+</odoo>

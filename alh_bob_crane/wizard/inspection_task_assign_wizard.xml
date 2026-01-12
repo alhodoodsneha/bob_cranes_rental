@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inspection_assign_wizard_form_view" model="ir.ui.view">
+        <field name="name">inspection.assign.wizard.form.view</field>
+        <field name="model">inspection.assign.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assign To">
+                <group>
+                    <field name="deadline" required="1"/>
+                </group>
+                <footer>
+                    <button name="action_assign_to" type="object"
+                            string="Assign" class="btn-primary"/>
+                    <button special="cancel" data-hotkey="z" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_inspection_assign_wizard_wizard" model="ir.actions.act_window">
+        <field name="name">Inspection Assign</field>
+        <field name="res_model">inspection.assign.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="inspection_assign_wizard_form_view"/>
+    </record>
+</odoo>

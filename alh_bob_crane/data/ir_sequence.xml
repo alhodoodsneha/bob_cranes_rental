@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Sequence for CRM -->
+        <record id="seq_crm_lead_code" model="ir.sequence">
+            <field name="name">Lead Sequence</field>
+            <field name="code">crm.lead</field>
+            <field name="prefix">INQ-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="number_increment">1</field>
+             <field name="company_id" eval="False"/>
+        </record>
+
+          <!-- Sequence for Inspection -->
+         <record id="seq_task_inspection" model="ir.sequence">
+            <field name="name">Inspection Task Sequence</field>
+            <field name="code">project.task.inspection</field>
+            <field name="prefix">INS/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_increment">1</field>
+              <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_task_loading" model="ir.sequence">
+            <field name="name">Loading Task Sequence</field>
+            <field name="code">project.task.loading</field>
+            <field name="prefix">LOAD/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_increment">1</field>
+              <field name="company_id" eval="False"/>
+        </record>
+
+         <record id="seq_legal_case" model="ir.sequence">
+            <field name="name">Legal Case</field>
+            <field name="code">legal.case</field>
+            <field name="prefix">LGC/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+             <field name="company_id" eval="False"/>
+        </record>
+
+
+    </data>
+</odoo>

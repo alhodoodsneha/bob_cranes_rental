@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="view_legal_case_form" model="ir.ui.view">
+        <field name="name">legal.case.form</field>
+        <field name="model">legal.case</field>
+        <field name="arch" type="xml">
+            <form string="Legal Case">
+                <header>
+                      <field name="status" widget="statusbar"  options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="sequence_code"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                           <field name="partner_id"/>
+                           <field name="reason"/>
+                           <field name="next_action_date"/>
+                        </group>
+                        <group>
+                            <field name="priority"/>
+                            <field name="project_id"/>
+                            <field name="pdc_received_id"/>
+                        </group>
+                    </group>
+                    <group string="Case Information">
+                        <group>
+                               <field name="case_register" invisible="1"/>
+                               <field name="case_type" invisible="case_register == False"/>
+                               <field name="case_reference" invisible="case_register == False"/>
+                        </group>
+                        <group>
+
+                        </group>
+                    </group>
+                    <notebook>
+                         <page name="case_details_page" string="Description">
+                             <field name="name" widget="html"/>
+                         </page>
+                         <page name="legal_notes_details_page" string="Legal Notes">
+                             <field name="legal_notes" widget="html"/>
+                         </page>
+                    </notebook>
+                </sheet>
+                 <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_legal_case_tree" model="ir.ui.view">
+        <field name="name">legal.case.tree</field>
+        <field name="model">legal.case</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence_code"/>
+                <field name="partner_id"/>
+               <field name="reason"/>
+               <field name="next_action_date"/>
+                <field name="priority"/>
+                <field name="project_id"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_legal_case" model="ir.actions.act_window">
+        <field name="name">Legal Case</field>
+        <field name="res_model">legal.case</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_legal_case_tree"/>
+        <field name="help" type="html">
+            <p>
+                Create and manage your Legal Case
+            </p>
+        </field>
+    </record>
+
+
+        <record id="view_case_type_form" model="ir.ui.view">
+        <field name="name">case.type.form</field>
+        <field name="model">case.type</field>
+        <field name="arch" type="xml">
+            <form string="Case Type">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_case_type_tree" model="ir.ui.view">
+        <field name="name">case.type.tree</field>
+        <field name="model">case.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_case_type_search" model="ir.ui.view">
+        <field name="name">case.type.search</field>
+        <field name="model">case.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_case_type" model="ir.actions.act_window">
+        <field name="name">Case Type</field>
+        <field name="res_model">case.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_case_type_tree"/>
+        <field name="search_view_id" ref="view_case_type_search"/>
+        <field name="help" type="html">
+            <p>
+                Create and manage your Case Type
+            </p>
+        </field>
+    </record>
+
+ <menuitem
+            name="Legal Case"
+            id="menu_legal_case_view_main"
+            active="True"
+            web_icon="alh_bob_crane,static/description/icon.png"
+            groups="alh_bob_crane.group_legal_manager,alh_bob_crane.group_legal_user"
+            sequence="20">
+      <menuitem
+            name="Legal Case"
+            id="menu_legal_case_view"
+            action="action_legal_case"
+            sequence="5"
+    />
+      <menuitem id="menu_configuration_legal_case"
+                  name="Configuration"
+                sequence="30">
+
+           <menuitem
+                name="Case Type"
+                id="menu_legal_case_type_view"
+                action="action_case_type"
+                sequence="5"
+            />
+      </menuitem>
+
+ </menuitem>
+
+</odoo>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_hse_checklist_form" model="ir.ui.view">
+        <field name="name">hse.checklist.form</field>
+        <field name="model">hse.checklist</field>
+        <field name="arch" type="xml">
+            <form string="HSE Checklist">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                    </group>
+                    <notebook>
+                         <page name="checklists_line_page" string="Checklist">
+                            <field name="checklists_line_ids" widget="one2many">
+                                <list string="Checklist" editable="bottom">
+                                    <field name="checkist_id" column_invisible="1"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                   </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_hse_checklist_tree" model="ir.ui.view">
+        <field name="name">hse.checklist.tree</field>
+        <field name="model">hse.checklist</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_hse_checklist_search" model="ir.ui.view">
+        <field name="name">hse.checklist.search</field>
+        <field name="model">hse.checklist</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_hse_checklist" model="ir.actions.act_window">
+        <field name="name">Hse Check List</field>
+        <field name="res_model">hse.checklist</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_hse_checklist_tree"/>
+        <field name="search_view_id" ref="view_hse_checklist_search"/>
+        <field name="help" type="html">
+            <p>
+                Create and manage your Hse Checklist
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+            name="Hse Check List"
+            id="menu_hse_check_list"
+            parent="project.menu_project_config"
+            action="action_hse_checklist"
+            sequence="12"
+    />
+
+
+</odoo>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form_inherited_bob_creane" model="ir.ui.view">
+        <field name="name">crm.lead.view.form.inherit.bobcrane</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <h1>
+                    <field name="sequence_code" readonly="1"/>
+                </h1>
+            </xpath>
+            <xpath expr="//group[@name='lead_priority']" position="before">
+                <group>
+                       <field name="is_inspection_required" />
+                       <field name="job_name"/>
+                       <field name="site_location"/>
+                       <field name="complete_inspection" invisible="1" />
+                       <field name="inspection_task" readonly="1" invisible="assigned == False"/>
+                </group>
+            </xpath>
+             <xpath expr="//page[@name='internal_notes']" position="before">
+                <page name="job_details" string="Job Details">
+                     <field name="job_details"/>
+                </page>
+             </xpath>
+
+              <xpath expr="//button[@name='action_set_won_rainbowman']"
+                   position="after">
+                <field name="assigned" invisible="1"/>
+                <button name="action_assign_to_job_creation"
+                            string="Assign Inspection"
+                            type="object" class="oe_highlight" data-hotkey="o"
+                            groups="sales_team.group_sale_manager,sales_team.group_sale_salesman_all_leads,sales_team.group_sale_salesman"
+                            invisible="assigned != False or is_inspection_required == False or type == 'lead'"/>
+                   <button name="action_create_quotation" string="New Quotation"
+                            type="object" class="btn btn-primary oe_highlight quote_inspection"
+                            data-hotkey="o"
+                            groups="sales_team.group_sale_manager,sales_team.group_sale_salesman_all_leads,sales_team.group_sale_salesman"
+                            invisible="type == 'lead' or probability == 0 and not active or is_inspection_required == False or complete_inspection == False"/>
+                  <button name="action_create_quotation" string="New Quotation"
+                           type="object" class="btn btn-primary oe_highlight quote_without_inspection"
+                           data-hotkey="o"
+                           groups="sales_team.group_sale_manager,sales_team.group_sale_salesman_all_leads,sales_team.group_sale_salesman"
+                           invisible="type == 'lead' or probability == 0 and not active or  is_inspection_required == True"/>
+              </xpath>
+
+
+            <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <widget name="web_ribbon" title="Draft"
+                        bg_color="text-bg-info"
+                        invisible="stage_type != 'draft'"/>
+                <widget name="web_ribbon" title="Under Inspection"
+                        bg_color="text-bg-info"
+                        invisible="stage_type != 'under_inspection'"/>
+                <widget name="web_ribbon" title="Inspection Completed"
+                        bg_color="text-bg-warning"
+                        invisible="stage_type != 'inspection_completed'"/>
+                <widget name="web_ribbon" title="Quote Created"
+                        bg_color="text-bg-info"
+                        invisible="stage_type != 'quote_created'"/>
+                <widget name="web_ribbon" title="Quote Confirmed"
+                        bg_color="text-bg-success"
+                        invisible="stage_type != 'quote_confirmed'"/>
+                 <widget name="web_ribbon" title="Quote Revised"
+                        bg_color="text-bg-danger"
+                        invisible="stage_type != 'quote_revised'"/>
+                <widget name="web_ribbon" title="Quote Cancelled"
+                        bg_color="text-bg-danger"
+                        invisible="stage_type != 'quote_cancelled'"/>
+            </xpath>
+        </field>
+    </record>
+
+     <record id="crm_case_form_view_oppor_inherited_bob_crane"
+            model="ir.ui.view">
+        <field name="name">crm.lead.oppor.inherit.bobcrane</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_sale_quotations_new']"
+                   position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="crm_case_tree_view_oppor_inherit_bob_crane" model="ir.ui.view">
+        <field name="name">crm.lead.view.list.inherit.bobcrane</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="stage_type" widget="badge"
+                       decoration-info="stage_type in ['draft','under_inspection','quote_created']"
+                       decoration-warning="stage_type == 'inspection_completed'"
+                       decoration-danger="stage_type == 'quote_revised'"
+                       decoration-success="stage_type == 'quote_confirmed'"
+                        decoration-muted="stage_type == 'quote_cancelled'"
+                       class="text-dark"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_case_kanban_view_leads_inherited_xplatform"
+            model="ir.ui.view">
+        <field name="name">crm.lead.kanban.lead.inherit.xplatform</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="stage_type" widget="badge"
+                       decoration-info="stage_type in ['draft','under_inspection','quote_created']"
+                       decoration-warning="stage_type == 'inspection_completed'"
+                       decoration-danger="stage_type == 'quote_revised'"
+                       decoration-success="stage_type == 'quote_confirmed'"
+                       decoration-muted="stage_type == 'quote_cancelled'"
+                       class="text-dark"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_crm_bobcrane_inherit_search" model="ir.ui.view">
+        <field name="name">crm.lead.search.inherit.bobcrane</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="stage_type"/>
+            </xpath>
+            <filter name="unassigned" position="after">
+                <filter string="Under Inspection" name="underinspection"
+                        domain="[('stage_type', '=', 'under_inspection')]"
+                        help="Under Estimation"/>
+                <filter string="Inspection Complete"
+                        name="inspection_complete"
+                        domain="[('stage_type', '=', 'inspection_completed')]"
+                        help="Inspection Complete"/>
+                <filter string="Quote Confirmed" name="quote_confirmed"
+                        domain="[('stage_type', '=', 'quote_confirmed')]"
+                        help="Quote Confirmed"/>
+                <filter string="Quote Revised" name="quote_revised"
+                        domain="[('stage_type', '=', 'quote_revised')]"
+                        help="Quote Revised"/>
+                <filter string="Quote Cancelled" name="quote_cancelled"
+                        domain="[('stage_type', '=', 'quote_cancelled')]"
+                        help="Quote Cancelled"/>
+            </filter>
+            <filter name="salesperson" position="after">
+                <filter name="stage_type" string="Status"
+                        context="{'group_by':'stage_type'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

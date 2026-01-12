@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="pdc_payment_received_form_inherited_property_rent" model="ir.ui.view">
+        <field name="name">pdc.payment.received.form.inherit.property.rent</field>
+        <field name="model">pdc.payment.received</field>
+        <field name="inherit_id" ref="pdc_payment_property.view_pdc_payment_received_form"/>
+        <field name="arch" type="xml">
+              <xpath expr="//div[@name='button_box']" position="inside">
+                  <button name="action_view_journal_entry" type="object"
+                                class="oe_stat_button" icon="fa-plus-square"
+                                string="Journals">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Journals
+                                </span>
+                            </div>
+                        </button>
+                  <button name="action_view_payment_invoice" type="object"
+                                class="oe_stat_button" icon="fa-money"
+                                string="Payments">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Payment
+                                </span>
+                            </div>
+                        </button>
+
+                    <button name="action_view_legal_cases" type="object"
+                                class="oe_stat_button" icon="fa-gavel"
+                                string="Legal Cases">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Legal Cases
+                                </span>
+                            </div>
+                        </button>
+              </xpath>
+             <xpath expr="//button[@name='action_returned']" position="after">
+                  <button name="action_create_legal" string="Register Legal Case" type="object" invisible="status != 'rejected'"
+                            class="btn btn-primary"/>
+             </xpath>
+        </field>
+    </record>
+</odoo>

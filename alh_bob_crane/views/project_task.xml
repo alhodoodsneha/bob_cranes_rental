@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_task_form_inherited_arm" model="ir.ui.view">
+        <field name="name">project.task.form.inherit.arm</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                  <field name="_is_inspection_task" invisible="1"/>
+                  <field name="_is_transportation_task" invisible="1"/>
+                  <field name="is_completed_transportation" invisible="1"/>
+                  <field name="is_completed_loading" invisible="1"/>
+                  <field name="_is_loading_task" invisible="1"/>
+                  <field name="_is_hse_task" invisible="1"/>
+                  <field name="is_completed" invisible="1"/>
+                  <field name="is_completed_verification" invisible="1"/>
+                  <field name="crm_lead_id" readonly="1"/>
+            </xpath>
+              <xpath expr="//field[@name='user_ids']" position="after">
+                    <field name="site_location" invisible="_is_inspection_task == False" />
+                    <field name="appropriate_equipment_capacity" readonly="is_completed == True" invisible="_is_inspection_task == False" />
+              </xpath>
+            <xpath expr="//field[@name='project_id']" position="attributes">
+                <attribute name="readonly">_is_inspection_task == True</attribute>
+            </xpath>
+              <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="readonly">_is_inspection_task == True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="attributes">
+                <attribute name="readonly">_is_inspection_task == True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_deadline']" position="attributes">
+                <attribute name="readonly">_is_inspection_task == True</attribute>
+            </xpath>
+            <xpath expr="//page[@name='description_page']" position="after">
+                <page name="inspection_attachment_ids" string="Attachment"
+                      invisible="_is_inspection_task == False">
+                    <field name="inspection_attachment_ids" widget="one2many"
+                           readonly="is_completed == True">
+                        <list string="Inspection" editable="bottom"
+                              readonly="is_completed == True">
+                            <field name="task_id" column_invisible="1"/>
+                            <field name="is_completed" column_invisible="1"/>
+                            <field name="description"
+                                   readonly="is_completed == True"/>
+                            <field name="images" widget="image"
+                                   readonly="is_completed == True"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='stage_id']" position="before">
+                 <button name="action_complete_inspection" type="object"
+                        string="Inspection Complete" class="btn-primary"
+                        invisible="_is_inspection_task == False or is_completed == True"
+                />
+                 <button name="action_assign_to" type="object"
+                        string="Re Assign" class="btn-primary"
+                        invisible="_is_inspection_task == False or is_completed == True" groups="alh_bob_crane.group_inspection_manager"
+                />
+
+                  <button name="action_verified_hse" type="object"
+                        string="Completed Verification" class="btn-primary"
+                        invisible="_is_hse_task == False or is_completed_verification == True"
+                />
+
+                 <button name="action_assign_hse_to" type="object"
+                        string="Re Assign" class="btn-primary"
+                        invisible="_is_hse_task == False or is_completed_verification == True" groups="alh_bob_crane.group_hse_group_manager"
+                />
+                <button name="action_complete_transportation" type="object"
+                        string="Completed" class="btn-primary"
+                        invisible="_is_transportation_task == False or is_completed_transportation == True"
+                />
+                 <button name="%(action_report_inspection_task)d"
+                        string="Inspection Report"
+                        type="action"
+                        class="btn-primary"
+                        invisible="_is_inspection_task == False"
+                />
+                 <button name="action_loading_task" type="object"
+                        string="Loading" class="btn-primary"
+                        invisible="_is_loading_task == False or is_completed_loading == True"
+                />
+                <button name="action_complete_loading" type="object"
+                        string="Complete Loading" class="btn-primary"
+                        invisible="_is_loading_task == False or is_completed_loading == True"
+                />
+                 <button name="action_assign_transport_to" type="object"
+                        string="Re Assign" class="btn-primary"
+                        invisible="_is_transportation_task == False or is_completed_transportation == True" groups="alh_bob_crane.group_transport_group_manager"
+                />
+                  <button name="action_assign_loading_to" type="object"
+                        string="Re Assign" class="btn-primary"
+                        invisible="_is_loading_task == False or is_completed_loading == True" groups="alh_bob_crane.group_loading_group_manager"
+                />
+            </xpath>
+             <xpath expr="//page[@name='description_page']" position="before">
+                <page name="hse_verification_line" string="Verification Items" invisible="_is_hse_task == False">
+                        <field name="hse_verification_line_ids" widget="one2many" readonly="is_completed_verification == True">
+                            <list string="HSE Checklist" editable="bottom" delete="0" create="1">
+                                <field name="task_id" column_invisible="1"/>
+                                <field name="sequence" widget="handle"/>
+                                <field name="name" readonly="state in['done','fail']"/>
+                                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'fail'" decoration-info="state == 'waiting'"/>
+                                  <field name="notes" readonly="state in['done','fail']"/>
+                                <button name="action_checklist_done" type="object" string="Ok"
+                                        class="btn-primary"
+                                        invisible="state != 'waiting'"/>
+                                <button name="action_checklist_fail" type="object" string="Not Ok"
+                                        class="btn-primary"
+                                        invisible="state != 'waiting'"/>
+                            </list>
+                        </field>
+                    </page>
+                 <page name="equipment_loading_line" string="Equipment Loading Items" invisible="_is_loading_task == False">
+                        <field name="equipment_loading_line_ids" widget="one2many" readonly="1">
+                            <list string="Loading Equipment" editable="bottom" >
+                                <field name="task_id" column_invisible="1"/>
+                                <field name="project_id" column_invisible="1"/>
+                                <field name="equipment_allocation_id" column_invisible="1"/>
+                                <field name="equipment_id" readonly="1"/>
+                                <field name="start_date" readonly="1"/>
+                                <field name="end_date" readonly="1"/>
+                                <field name="qty" column_invisible="1"/>
+                                <field name="status_updated" readonly="1"/>
+                                <field name="updated_by" readonly="1"/>
+                                <field name="updated_on" readonly="1"/>
+                            </list>
+                        </field>
+                 </page>
+             </xpath>
+                 <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <widget name="web_ribbon" title="Verified"
+                        bg_color="text-bg-success"
+                        invisible="is_completed_verification == False or _is_hse_task == False"/>
+                 </xpath>
+        </field>
+    </record>
+
+     <record id="view_task_form2_inherited" model="ir.ui.view">
+            <field name="name">project.task.view.form.inherit.bob.crane</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project_task_risk_management_odoo.view_task_form2"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//button[@name='task_create_incident_wiz']" position="attributes">
+                       <attribute name="invisible">_is_inspection_task == False</attribute>
+                 </xpath>
+            </field>
+     </record>
+
+
+
+     <record id="action_inspection_task" model="ir.actions.act_window">
+        <field name="name">Inspection Task</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="project.view_task_search_form"/>
+        <field name="domain">[('_is_inspection_task', '=', True)]</field>
+        <field name="context">{'default__is_inspection_task':
+            True,'search_default_open_tasks':
+            1,'create': False,'delete': False,}
+        </field>
+        <field name="help" type="html">
+            <p>View Inspection Task</p>
+        </field>
+    </record>
+
+     <record id="action_hse_task" model="ir.actions.act_window">
+        <field name="name">HSE Task</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="project.view_task_search_form"/>
+        <field name="domain">[('_is_hse_task', '=', True)]</field>
+        <field name="context">{'default__is_hse_task':
+            True,'search_default_open_tasks':
+            1,'create': False,'delete': False,}
+        </field>
+        <field name="help" type="html">
+            <p>View HSE Task</p>
+        </field>
+    </record>
+
+    <record id="action_transportation_task" model="ir.actions.act_window">
+        <field name="name">Transportation Task</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="project.view_task_search_form"/>
+        <field name="domain">[('_is_transportation_task', '=', True)]</field>
+        <field name="context">{'default__is_transportation_task':
+            True,'search_default_open_tasks':
+            1,'create': False,'delete': False,}
+        </field>
+        <field name="help" type="html">
+            <p>View HSE Task</p>
+        </field>
+    </record>
+
+
+     <record id="action_loading_task" model="ir.actions.act_window">
+        <field name="name">Loading Task</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="project.view_task_search_form"/>
+        <field name="domain">[('_is_loading_task', '=', True)]</field>
+        <field name="context">{'default__is_loading_task':
+            True,'search_default_open_tasks':
+            1,'create': True,'delete': False,}
+        </field>
+        <field name="help" type="html">
+            <p>View Loading Task</p>
+        </field>
+    </record>
+
+    <menuitem
+            name="Inspection Task"
+            id="menu_inspection_task"
+            action="action_inspection_task"
+            parent="project.menu_main_pm"
+            groups="alh_bob_crane.group_inspection_user,alh_bob_crane.group_inspection_manager"
+            sequence="8"
+    />
+     <menuitem
+            name="HSE Task"
+            id="menu_hse_task"
+            action="action_hse_task"
+            parent="project.menu_main_pm"
+            groups="alh_bob_crane.group_hse_user,alh_bob_crane.group_hse_group_manager"
+            sequence="8"
+    />
+
+    <menuitem
+            name="Transportation Task"
+            id="menu_transportation_task"
+            action="action_transportation_task"
+            parent="project.menu_main_pm"
+            groups="alh_bob_crane.group_transport_user,alh_bob_crane.group_transport_group_manager"
+            sequence="8"
+    />
+
+     <menuitem
+            name="Loading Task"
+            id="menu_loading_task"
+            action="action_loading_task"
+            parent="project.menu_main_pm"
+            groups="alh_bob_crane.group_loading_user,alh_bob_crane.group_loading_group_manager"
+            sequence="8"
+    />
+</odoo>
