@@ -1,5 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+         <record id="view_form_technical_specification" model="ir.ui.view">
+        <field name="name">technical.specification.form.view</field>
+        <field name="model">technical.specification</field>
+        <field name="arch" type="xml">
+            <form string="Technical Specification">
+                <header>
+                </header>
+                <sheet>
+                    <label for="name"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_technical_specification" model="ir.ui.view">
+        <field name="name">technical.specification.tree.view</field>
+        <field name="model">technical.specification</field>
+        <field name="arch" type="xml">
+            <list string="Technical Specification" create="1" delete="1">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+
+    <!-- Action to open the list view of Technical specification team model -->
+    <record id="action_technical_specification" model="ir.actions.act_window">
+        <field name="name">Technical Specification</field>
+        <field name="res_model">technical.specification</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_tree_technical_specification"/>
+        <field name="help" type="html">
+            <p>
+                Create and manage your Technical Specification
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+            name="Technical Specification"
+            id="menu_technical_specification_view"
+            parent="fleet.fleet_configuration"
+            action="action_technical_specification"
+            sequence="11"
+    />
+
         <record id="fleet_vehicle_view_form_inherited_bob_creane" model="ir.ui.view">
         <field name="name">fleet.vehicle.view.form.inherit.bobcrane</field>
         <field name="model">fleet.vehicle</field>
@@ -13,6 +63,16 @@
                     <field name="project_loc" required="1" />
             </xpath>
              <xpath expr="//page[@name='page_tax_info']" position="after">
+                 <page string="Technical Specification" name="technical_specification_page">
+                        <field name="specification_line_ids">
+                            <list editable="bottom" string="Technical Specification">
+                                <field name="fleet_id" column_invisible="1"/>
+                                <field name="model_id" column_invisible="1"/>
+                                <field name="technical_specification_id"/>
+                                <field name="value"/>
+                            </list>
+                        </field>
+                </page>
                     <page string="Location History" name="location_history">
                         <field name="location_history_ids" readonly="1">
                             <list>
@@ -24,8 +84,35 @@
                             </list>
                         </field>
                 </page>
+
+                  <page string="Tracking &amp; Usage" name="tracking_and_usage">
+                        <group>
+                            <group>
+                                  <field name="gps_device_id"/>
+                                  <field name="engine_hours_used"/>
+                            </group>
+                            <group>
+                                  <field name="gps_enabled"/>
+                                  <field name="fuel_consumption"/>
+                                  <field name="utilization_percentage"/>
+                            </group>
+                        </group>
+                </page>
              </xpath>
         </field>
     </record>
+
+
+    <record id="fleet_vehicle_model_view_form_inherited_bob_creane" model="ir.ui.view">
+        <field name="name">fleet.vehicle.model.view.form.inherit.bobcrane</field>
+        <field name="model">fleet.vehicle.model</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_model_view_form"/>
+        <field name="arch" type="xml">
+               <xpath expr="//field[@name='category_id']" position="after">
+                      <field name="technical_specification_ids" widget="many2many_tags"/>
+               </xpath>
+        </field>
+    </record>
+
 
 </odoo>

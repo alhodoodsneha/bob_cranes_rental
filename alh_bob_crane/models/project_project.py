@@ -122,6 +122,59 @@ class Project(models.Model):
         string="Description"
     )
 
+    rental_rate_hourly = fields.Float(
+        string="Rental Rate (Hourly)",
+        default=0.0
+    )
+
+    rental_rate_daily = fields.Float(
+        string="Rental Rate (Daily)",
+        default=0.0
+    )
+
+    rental_rate_monthly = fields.Float(
+        string="Rental Rate (Monthly)",
+        default=0.0
+    )
+
+    rental_rate_weekly = fields.Float(
+        string="Rental Rate (Weekly)",
+        default=0.0
+    )
+
+    minimum_rental_hours = fields.Float(
+        string="Minimum Rental Hours"
+    )
+
+    mobilization_charge = fields.Float(
+        string="Mobilization Charge",
+        default=0.0
+    )
+
+    demobilization_charge = fields.Float(
+        string="Demobilization Charge",
+        default=0.0
+    )
+
+    overtime_rate = fields.Float(
+        string="Overtime Rate",
+        default=0.0
+    )
+
+    operator_included = fields.Selection(
+        [('yes','Yes'),('no','No')],
+        string="Operator Included"
+    )
+
+    operator_cost = fields.Float(
+        string="Operator Cost"
+    )
+
+    fuel_included = fields.Selection(
+        [('yes', 'Yes'), ('no', 'No')],
+        string="Fuel Included"
+    )
+
     @api.model
     def create(self, vals):
         res = super(Project, self).create(vals)
@@ -286,6 +339,17 @@ class Project(models.Model):
             'domain': [('id', '=', task_id.id)],
             'type': 'ir.actions.act_window',
             'context': {'default_project_id': self.id, 'default__is_loading_task': True}
+        }
+
+    def action_view_project_vehicles(self):
+        self.ensure_one()
+        return {
+            'name': 'Project Vehicles',
+            'type': 'ir.actions.act_window',
+            'res_model': 'fleet.vehicle',
+            'view_mode': 'list,form',
+            'domain': [('project_loc', '=', self.project_loc.id)],
+            'context': {'default_project_loc': self.project_loc.id},
         }
 
 class InvoiceAllocation(models.Model):

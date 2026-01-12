@@ -49,5 +49,7 @@ access_project_assign_transportation_wizard,project.assign.transportation.wizard
 access_project_assign_loading_wizard,project.assign.loading.wizard,model_project_assign_loading_wizard,,1,1,1,1
 access_fleet_vehicle_group_load_manager_admin,fleet.vehicle.load.manager,model_fleet_vehicle,alh_bob_crane.group_loading_group_manager,1,1,1,1
 access_fleet_vehicle_group_load_user,fleet.vehicle.load.user,model_fleet_vehicle,alh_bob_crane.group_loading_user,1,1,1,1
+access_technical_specification,technical.specification,model_technical_specification,,1,1,1,1
+access_technical_specification_items,technical.specification.items,model_technical_specification_items,,1,1,1,1
 
 

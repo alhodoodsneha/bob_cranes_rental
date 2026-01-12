@@ -22,6 +22,16 @@
 from odoo import api, models, fields,_
 
 
+class TechnicalSpecification(models.Model):
+    _name = 'technical.specification'
+    _description = 'Technical Specification'
+    _rec_name = 'name'
+
+    name = fields.Char(
+        string="Name"
+    )
+
+
 class FleetVehicle(models.Model):
     _inherit = 'fleet.vehicle'
 
@@ -57,6 +67,33 @@ class FleetVehicle(models.Model):
         string="Location History"
     )
 
+    specification_line_ids = fields.One2many(
+        'technical.specification.items',
+        'fleet_id',
+        string="Specification Items"
+    )
+
+    gps_device_id = fields.Char(
+        string="GPS Device ID"
+    )
+
+    gps_enabled = fields.Selection(
+        [('yes', 'Yes'), ('no', 'No')],
+        string="GPS Enabled"
+    )
+
+    engine_hours_used = fields.Float(
+        string="Engine Hours Used"
+    )
+
+    fuel_consumption = fields.Float(
+        string="Fuel Consumption"
+    )
+
+    utilization_percentage = fields.Float(
+        string="Utilization Percentage"
+    )
+
     @api.model
     def create(self, vals):
         """ Create function inherited for create  """
@@ -69,6 +106,21 @@ class FleetVehicle(models.Model):
         })
         res.account_asset_id = asset_id.id
         return res
+
+    @api.onchange('model_id')
+    def _onchange_model_id_create_spec_lines(self):
+        for vehicle in self:
+            lines = []
+            vehicle.specification_line_ids = [(5, 0, 0)]
+
+            if vehicle.model_id:
+                for spec in vehicle.model_id.technical_specification_ids:
+                    lines.append((0, 0, {
+                        'technical_specification_id': spec.id,
+                        'model_id': vehicle.model_id.id,
+                    }))
+
+            vehicle.specification_line_ids = lines
 
 class FleetVehicleLocationHistory(models.Model):
     _name = 'fleet.vehicle.location.history'
@@ -105,4 +157,41 @@ class FleetVehicleLocationHistory(models.Model):
         string="Updated On",
         default=fields.Datetime.now,
         readonly=True
+    )
+
+
+
+class FleetVehicleModel(models.Model):
+    _inherit = 'fleet.vehicle.model'
+    _description = 'Fleet Vehicle Model'
+
+    technical_specification_ids = fields.Many2many(
+        'technical.specification',
+        string="Technical Specifications"
+    )
+
+
+class TechnicalSpecificationItems(models.Model):
+    _name = 'technical.specification.items'
+    _description = 'Technical Specification Items'
+    _rec_name = 'technical_specification_id'
+
+
+    technical_specification_id = fields.Many2one(
+        'technical.specification',
+        string="Technical Specification"
+    )
+
+    value = fields.Char(
+        string="Value"
+    )
+
+    fleet_id = fields.Many2one(
+        'fleet.vehicle',
+        string="Fleet"
+    )
+
+    model_id = fields.Many2one(
+        'fleet.vehicle.model',
+        string="Model"
     )

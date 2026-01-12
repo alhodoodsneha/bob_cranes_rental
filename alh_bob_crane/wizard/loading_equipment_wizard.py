@@ -113,9 +113,21 @@ class LoadingEquipmentWizard(models.TransientModel):
                     'updated_on': fields.Date.today(),
                      'status_updated': "Installation Completed"
                 })
-            self.env['fleet.vehicle.location.history'].sudo().create({
-                'vehicle_id':rec.equipment_id.id,
-                'source_location_id':rec.equipment_id.project_loc.sudo().id,
-                'destination_location_id':self.project_id.project_loc.sudo().id,
-            })
-            rec.equipment_id.project_loc = self.project_id.project_loc.id
+            if self.type_load == 'loading':
+                self.env['fleet.vehicle.location.history'].sudo().create({
+                    'vehicle_id': rec.equipment_id.id,
+                    'source_location_id': rec.equipment_id.project_loc.sudo().id,
+                    'destination_location_id': self.project_id.project_loc.sudo().id,
+                })
+                rec.equipment_id.project_loc = self.project_id.project_loc.id
+            if self.type_load == 'unloading':
+                warehouse = self.env['stock.warehouse'].sudo().search([
+                    ('company_id', '=', rec.equipment_id.company_id.id)
+                ], limit=1)
+                if warehouse.lot_stock_id:
+                    self.env['fleet.vehicle.location.history'].sudo().create({
+                        'vehicle_id': rec.equipment_id.id,
+                        'source_location_id': self.project_id.project_loc.sudo().id,
+                        'destination_location_id': warehouse.lot_stock_id.id,
+                    })
+                    rec.equipment_id.project_loc = warehouse.lot_stock_id.id
