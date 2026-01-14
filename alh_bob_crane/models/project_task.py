@@ -124,6 +124,7 @@ class ProjectTask(models.Model):
                 self.id,
                 email_values={
                     'email_to': self.crm_lead_id.user_id.partner_id.email,
+                    'email_cc': self.create_uid.partner_id.email,
                 },
                 force_send=True
             )
