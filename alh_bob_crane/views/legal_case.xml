@@ -28,7 +28,7 @@
                     </group>
                     <group string="Case Information">
                         <group>
-                               <field name="case_register" invisible="1"/>
+                               <field name="case_register" />
                                <field name="case_type" invisible="case_register == False"/>
                                <field name="case_reference" invisible="case_register == False"/>
                         </group>

@@ -18,8 +18,6 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from email.policy import default
-
 from odoo import api, models, fields,_
 from odoo.exceptions import UserError
 

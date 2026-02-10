@@ -206,7 +206,9 @@ class ProjectTask(models.Model):
         if self.create_uid and self.create_uid != self.env.user:
             if self.create_uid.partner_id.email:
                 cc_partners |= self.create_uid.partner_id
-        cc_emails = ','.join(cc_partners.mapped('email'))
+        cc_emails = ','.join(
+            email for email in cc_partners.mapped('email') if email
+                             )
         if self.project_id.user_id.partner_id.email:
             base_url = self.env['ir.config_parameter'].sudo().get_param(
                 'web.base.url')
@@ -271,7 +273,9 @@ class ProjectTask(models.Model):
         if self.create_uid and self.create_uid != self.env.user:
             if self.create_uid.partner_id.email:
                 cc_partners |= self.create_uid.partner_id
-        cc_emails = ','.join(cc_partners.mapped('email'))
+        cc_emails = ','.join(
+        email for email in cc_partners.mapped('email') if email
+        )
         if self.project_id.user_id.partner_id.email:
             base_url = self.env['ir.config_parameter'].sudo().get_param(
                 'web.base.url')
