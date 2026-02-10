@@ -13,6 +13,7 @@
             <xpath expr="//group[@name='lead_priority']" position="before">
                 <group>
                        <field name="is_inspection_required" />
+                       <field name="is_quote_created" invisible="1"/>
                        <field name="job_name"/>
                        <field name="site_location"/>
                        <field name="complete_inspection" invisible="1" />
@@ -37,12 +38,12 @@
                             type="object" class="btn btn-primary oe_highlight quote_inspection"
                             data-hotkey="o"
                             groups="sales_team.group_sale_manager,sales_team.group_sale_salesman_all_leads,sales_team.group_sale_salesman"
-                            invisible="type == 'lead' or probability == 0 and not active or is_inspection_required == False or complete_inspection == False"/>
+                            invisible="type == 'lead' or probability == 0 and not active or is_inspection_required == False or complete_inspection == False or is_quote_created == True"/>
                   <button name="action_create_quotation" string="New Quotation"
                            type="object" class="btn btn-primary oe_highlight quote_without_inspection"
                            data-hotkey="o"
                            groups="sales_team.group_sale_manager,sales_team.group_sale_salesman_all_leads,sales_team.group_sale_salesman"
-                           invisible="type == 'lead' or probability == 0 and not active or  is_inspection_required == True"/>
+                           invisible="type == 'lead' or probability == 0 and not active or  is_inspection_required == True or is_quote_created == True"/>
               </xpath>
 
 

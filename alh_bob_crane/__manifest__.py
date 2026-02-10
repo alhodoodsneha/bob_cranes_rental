@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'Equipment Rental Management',
-    'version': '19.0.0.0.1',
+    'version': '19.0.0.0.2',
     'category': 'Equipment Rental Management',
     'sequence': 2,
     'website': 'https://www.alhodood.com/',

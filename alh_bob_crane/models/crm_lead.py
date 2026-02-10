@@ -18,6 +18,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+from email.policy import default
+
 from odoo import api, models, fields,_
 from odoo.exceptions import UserError
 
@@ -84,6 +86,11 @@ class Lead(models.Model):
         copy=False
     )
 
+    is_quote_created = fields.Boolean(
+        string="Is Quote Created",
+        default=False,
+    )
+
     @api.model
     def create(self, vals):
         """ Create function inherited for sequence generation """
@@ -134,6 +141,7 @@ class Lead(models.Model):
             'crm_lead_id': self.id,
         })
         self.stage_type = 'quote_created'
+        self.is_quote_created = True
         return {
             'name': 'Quotation',
             'type': 'ir.actions.act_window',
