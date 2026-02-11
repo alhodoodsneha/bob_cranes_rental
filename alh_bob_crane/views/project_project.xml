@@ -8,6 +8,7 @@
              <xpath expr="//field[@name='partner_id']" position="after">
                   <field name="inspection_project" invisible="1"/>
                   <field name="is_assign_hse" invisible="1"/>
+                  <field name="is_job_work" invisible="1"/>
                   <field name="is_assign_transport" invisible="1"/>
                   <field name="sale_order_job" invisible="inspection_project == True" readonly="1"/>
                   <field name="crm_lead_id" invisible="inspection_project == True" readonly="1"/>
@@ -32,7 +33,15 @@
 
                  <button name="action_loading_equipments"
                         type="object"
-                        string="Create Loadings"
+                        string="Create Mobilization"
+                        class="btn btn-primary"
+                         invisible="inspection_project == True"
+                        groups="alh_bob_crane.group_loading_group_manager"
+                />
+
+                <button name="action_demobilization_equipments"
+                        type="object"
+                        string="Create DeMobilization"
                         class="btn btn-primary"
                          invisible="inspection_project == True"
                         groups="alh_bob_crane.group_loading_group_manager"
@@ -44,13 +53,15 @@
                         <field name="equipment_allocation_ids" widget="one2many">
                             <list string="Equipments" editable="bottom" delete="1">
                                 <field name="project_id" column_invisible="1"/>
-                                <field name="equipment_id"/>
-                                <field name="start_date"/>
-                                <field name="end_date"/>
+                                <field name="equipment_id" readonly="loading_status != 'waiting'"/>
+                                <field name="start_date" readonly="loading_status != 'waiting'"/>
+                                <field name="end_date" readonly="loading_status != 'waiting'"/>
+                                <field name="rent_per_day" />
                                 <field name="qty" column_invisible="1"/>
                                 <field name="loading_status" readonly="1"/>
                                 <field name="is_loading" column_invisible="1"/>
                                 <field name="is_unloaded" column_invisible="1"/>
+                                <field name="as_of_today" readonly="1" sum="Total Amount"/>
                             </list>
                         </field>
                    </page>
@@ -81,7 +92,7 @@
                               <field name="mobilization_charge"/>
                               <field name="demobilization_charge"/>
                               <field name="overtime_rate"/>
-                              <field name="operator_cost" invisible="operator_included == 'no'" />
+                              <field name="operator_cost" invisible="operator_included == 'yes'" />
                          </group>
                      </group>
                       <group>
@@ -154,9 +165,17 @@
 
                    <button name="action_open_loading_task" type="object"
                                 class="oe_stat_button" icon="fa-tasks"
-                                string="Loading" invisible="inspection_project == True">
+                                string="Mobilization Work" invisible="inspection_project == True">
                             <div class="o_stat_info">
-                                <span class="o_stat_text">Loading Work</span>
+                                <span class="o_stat_text">Mobilization Work</span>
+                            </div>
+                   </button>
+
+                    <button name="action_open_un_loading_task" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                string="De Mobilization Work" invisible="inspection_project == True">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">De Mobilization Work</span>
                             </div>
                    </button>
 

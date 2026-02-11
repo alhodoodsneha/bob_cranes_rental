@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #############################################################################
+from email.policy import default
 
 #    Alhodood Technologies.
 #
@@ -94,6 +95,18 @@ class FleetVehicle(models.Model):
         string="Utilization Percentage"
     )
 
+    rent_per_day = fields.Float(
+        string="Rent Per Day",
+        default=0.0
+    )
+
+    is_available = fields.Boolean(
+        string="Is Available",
+        related='state_id.is_available',
+        store=True,
+    )
+
+
     @api.model
     def create(self, vals):
         """ Create function inherited for create  """
@@ -106,6 +119,14 @@ class FleetVehicle(models.Model):
         })
         res.account_asset_id = asset_id.id
         return res
+
+    @api.depends('state_id')
+    def _compute_is_available(self):
+        for rec in self:
+            if rec.state_id.is_available:
+                rec.is_available = True
+            else:
+                rec.is_available = False
 
     @api.onchange('model_id')
     def _onchange_model_id_create_spec_lines(self):
@@ -195,3 +216,28 @@ class TechnicalSpecificationItems(models.Model):
         'fleet.vehicle.model',
         string="Model"
     )
+
+class FleetVehicleState(models.Model):
+    _inherit = 'fleet.vehicle.state'
+
+    is_available = fields.Boolean(
+        string="Is Available",
+        default=False
+    )
+
+    on_job = fields.Boolean(
+        string="On Job",
+        default=False,
+    )
+
+    maintenance = fields.Boolean(
+        string="Under Maintenance",
+        default=False
+    )
+
+    reserved = fields.Boolean(
+        string="Reserved",
+        default=False,
+    )
+
+

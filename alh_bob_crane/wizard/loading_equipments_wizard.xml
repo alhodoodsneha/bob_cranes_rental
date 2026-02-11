@@ -8,7 +8,7 @@
                 <group>
                     <field name="project_id" invisible="1"/>
                     <field name="task_id" invisible="1"/>
-                    <field name="type_load"/>
+                    <field name="type_load" readonly="1"/>
                     <field name="allowed_equipment_ids" invisible="1"/>
                     <field name="equipment_ids" widget="many2many_tags"/>
                 </group>

@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'Equipment Rental Management',
-    'version': '19.0.0.0.3',
+    'version': '19.0.0.0.4',
     'category': 'Equipment Rental Management',
     'sequence': 2,
     'website': 'https://www.alhodood.com/',
@@ -44,6 +44,7 @@
         'views/crm_lead.xml',
         'views/project_project.xml',
         'views/inspectionl_report_template.xml',
+        'views/report_timesheet_template.xml',
         'views/ir_action_report.xml',
         'views/project_task.xml',
         'views/sale_order.xml',
@@ -58,6 +59,7 @@
         'wizard/lpo_adding_wizard.xml',
         'wizard/hse_check_list_wizard.xml',
         'wizard/loading_equipments_wizard.xml',
+        'wizard/timesheet_print_wizard.xml',
     ],
     'demo': [
     ],

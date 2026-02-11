@@ -31,3 +31,4 @@ from . import legal_case
 from . import legal_team
 from . import document_document
 from . import pdc_paymnet_received
+from . import timesheet_work_report

@@ -47,6 +47,7 @@ class JobCardAddingWizard(models.TransientModel):
                 'sale_order_job':self.sale_order.id,
                 'crm_lead_id':self.sale_order.crm_lead_id.id,
                 'project_value':self.sale_order.amount_total,
+                'is_job_work':True,
             }
         )
         if self.sale_order.crm_lead_id.inspection_task:

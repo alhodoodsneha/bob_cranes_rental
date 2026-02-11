@@ -19,6 +19,10 @@
                         type="object"
                          invisible="state != 'submitted'"
                         class="btn-success"/>
+                 <button name="action_print_timesheet"
+                        string="Print Timesheet"
+                        type="object"
+                        class="btn-success"/>
             </header>
 
             <sheet>
@@ -37,15 +41,18 @@
                         <field name="line_ids" readonly="state == 'approved'">
                             <list editable="bottom">
                                 <field name="date"/>
+                                <field name="no_of_vehicle"/>
                                 <field name="timesheet_id" column_invisible="1"/>
-                                <field name="task_id" required="1"/>
+                                <field name="task_id" column_invisible="1"/>
                                 <field name="project_id" column_invisible="1"/>
                                 <field name="allowed_employee_ids" column_invisible="1"/>
                                 <field name="employee_id"
                                        domain="[('id','in', allowed_employee_ids)]"/>
                                   <field name="name"/>
-                                <field name="employee_badge" readonly="1"/>
+                                <field name="employee_badge" column_invisible="1"/>
                                 <field name="hours"/>
+                                <field name="operator_hours"/>
+                                <field name="total_hours" sum="Total Cost Amount"/>
                             </list>
                         </field>
                     </page>
@@ -81,13 +88,22 @@
         </field>
     </record>
 
+
+    <menuitem
+            name="Work Timesheet"
+            id="menu_work_timesheet_main_menu"
+            parent="hr_timesheet.timesheet_menu_root"
+            groups="hr_timesheet.group_hr_timesheet_user"
+            sequence="14"
+    >
+
     <menuitem
             name="Work Timesheet"
             id="menu_work_timesheet"
-            parent="hr_timesheet.timesheet_menu_root"
             action="action_work_timesheet"
             groups="hr_timesheet.group_hr_timesheet_user"
-            sequence="14"
+            sequence="5"
     />
+    </menuitem>
 
 </odoo>
