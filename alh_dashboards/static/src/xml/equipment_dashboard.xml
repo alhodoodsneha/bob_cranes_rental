@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+<t t-name="alh_dashboards.equipment_dashboard">
+
+<div class="container-fluid p-4">
+
+<style>
+    html, body {
+        height: auto !important;
+        overflow-y: auto !important;
+    }
+.dashboard-card {
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+.dashboard-card:hover {
+    transform: translateY(-4px);
+}
+.kpi-title {
+    font-size: 14px;
+    color: #6c757d;
+}
+.kpi-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+</style>
+
+<h2 class="mb-4 text-primary fw-bold">Fleet &amp; Equipment Dashboard</h2>
+
+<!-- KPI SECTION -->
+<div class="row g-3 mb-4">
+
+    <t t-set="k" t-value="state.kpis"/>
+
+    <div class="col-md-2" t-foreach="Object.entries(this.state.kpis)" t-as="item" t-key="item[0]">
+
+        <div class="dashboard-card">
+            <div class="kpi-title">
+                <t t-esc="item[0]"/>
+            </div>
+            <div class="kpi-value text-primary">
+                <t t-esc="item[1] || 0"/>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    <div class="dashboard-card mt-4">
+    <h5 class="mb-3">Fleet Vehicles</h5>
+
+    <div class="row g-3 justify-content-center" style="max-height: 450px; overflow-y: auto;">
+        <t t-foreach="this.state.vehicles" t-as="vehicle" t-key="vehicle.id">
+            <div class="col-md-2">
+                <div class="card h-100 text-center">
+                    <img t-att-src="vehicle.image_url || '/web/static/src/img/placeholder.png'"
+                         class="card-img-top"
+                         style="height:120px; width:100%; object-fit:contain;"
+                         alt="Vehicle Image"/>
+
+                    <div class="card-body p-2">
+                        <h6 class="card-title mb-1" t-esc="vehicle.model"/>
+                        <p class="mb-0"><strong>Plate:</strong> <t t-esc="vehicle.license_plate"/></p>
+                        <p class="mb-0"><strong>Driver:</strong> <t t-esc="vehicle.driver || '-'"/></p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </div>
+</div>
+
+
+<!-- CHARTS -->
+<div class="row g-4 mb-4 mt-2">
+
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <h5>Status Distribution</h5>
+            <div style="height:300px;">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <h5>Equipment per Project</h5>
+            <div style="height:300px;">
+                <canvas id="projectChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- TABLE -->
+<div class="dashboard-card">
+    <h5 class="mb-3">Equipment Allocation</h5>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Equipment</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <t t-foreach="state.allocations" t-as="line" t-key="line.id">
+                <tr>
+                    <td><t t-esc="line.project"/></td>
+                    <td><t t-esc="line.equipment"/></td>
+                    <td><t t-esc="line.start"/></td>
+                    <td><t t-esc="line.end"/></td>
+                    <td>
+                        <span class="badge bg-info">
+                            <t t-esc="line.status"/>
+                        </span>
+                    </td>
+                </tr>
+            </t>
+        </tbody>
+    </table>
+
+</div>
+
+</div>
+</t>
+</templates>
