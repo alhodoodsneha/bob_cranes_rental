@@ -3,7 +3,7 @@
 
 #    Alhodood Technologies.
 #
-#    Copyright (C) 2024-TODAY Alhodood Technologies(<https://www.alhodood.com>)
+#    Copyright (C) 2026-TODAY Alhodood Technologies(<https://www.alhodood.com>)
 #    Author: Alhodood Technologies(<https://www.alhodood.com>)
 #
 #    You can modify it under the terms of the GNU Affero General Public License
