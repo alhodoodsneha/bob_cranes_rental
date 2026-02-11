@@ -51,7 +51,19 @@ class ProjectTask(models.Model):
     )
 
     _is_loading_task = fields.Boolean(
-        string="IS Transportation Task",
+        string="IS Mobilisation Task",
+        default=False,
+        copy=False
+    )
+
+    _is_de_mobilization__task = fields.Boolean(
+        string="IS De Mobilization Task",
+        default=False,
+        copy=False
+    )
+
+    is_completed_demobilization = fields.Boolean(
+        string="IS De Mobilization Completed",
         default=False,
         copy=False
     )
@@ -176,6 +188,19 @@ class ProjectTask(models.Model):
             'view_mode': 'form',
             "view_type": "form",
             'res_model': 'project.assign.loading.wizard',
+            'target': 'new',
+            'context': {
+                'active_id': self.id,
+            }
+        }
+
+    def action_assign_demobilization_to(self):
+        return {
+            'name': 'Re Assign To',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            "view_type": "form",
+            'res_model': 'project.assign.demobilization.wizard',
             'target': 'new',
             'context': {
                 'active_id': self.id,
@@ -339,8 +364,28 @@ class ProjectTask(models.Model):
             }
         }
 
+    def action_unloading_task(self):
+        return {
+            'name': 'Un Loading Equipment',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            "view_type": "form",
+            'res_model': 'loading.equipment.wizard',
+            'target': 'new',
+            'context': {
+                'active_id': self.id,
+                'default_project_id': self.project_id.id,
+                'default_task_id': self.id,
+                'default_type_load': 'unloading',
+            }
+        }
+
     def action_complete_loading(self):
         self.is_completed_loading = True
+        self.state = '1_done'
+
+    def action_complete_unloading(self):
+        self.is_completed_demobilization = True
         self.state = '1_done'
 
 class InspectionAttachment(models.Model):

@@ -63,15 +63,15 @@ class WorkTimesheet(models.Model):
         self.write({'state': 'submitted'})
 
     def action_approve(self):
-        for line in self.line_ids:
-            self.env['account.analytic.line'].create({
-                'name': line.name,
-                'date': line.date,
-                'employee_id': line.employee_id.id,
-                'project_id': line.project_id.id,
-                'unit_amount': line.hours,
-                'company_id': self.company_id.id,
-            })
+        # for line in self.line_ids:
+        #     self.env['account.analytic.line'].create({
+        #         'name': line.name,
+        #         'date': line.date,
+        #         'employee_id': line.employee_id.id,
+        #         'project_id': line.project_id.id,
+        #         'unit_amount': line.hours,
+        #         'company_id': self.company_id.id,
+        #     })
         self.write({'state': 'approved'})
         groups = [
             'alh_bob_crane.group_project_manaager_admin',
@@ -134,6 +134,19 @@ class WorkTimesheet(models.Model):
             self.env['mail.mail'].sudo().create(main_content).send()
 
 
+    def action_print_timesheet(self):
+        return {
+            'name': 'Print Timesheet',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            "view_type": "form",
+            'res_model': 'timesheet.report.wizard',
+            'target': 'new',
+            'context': {
+                'active_id': self.id,
+                'default_project_id': self.project_id.id,
+            }
+        }
 
 class WorkTimesheetLine(models.Model):
     _name = 'work.timesheet.line'
@@ -174,7 +187,6 @@ class WorkTimesheetLine(models.Model):
     employee_id = fields.Many2one(
         'hr.employee',
         string='Employee',
-        required=True,
         domain="[('id', 'in', allowed_employee_ids)]"
     )
 
@@ -183,9 +195,24 @@ class WorkTimesheetLine(models.Model):
         related='employee_id.barcode'
     )
 
+    no_of_vehicle = fields.Integer(
+        string="No Of Vehicle",
+        default=0,
+    )
+
+    operator_hours = fields.Float(
+        string="Operator Hours",
+        default=0.0,
+    )
+
     hours = fields.Float(
-        string='Hours',
+        string='Total Working Hours',
         required=True
+    )
+
+    total_hours = fields.Float(
+        string="Total Cost",
+        compute='_compute_total_cost'
     )
 
 
@@ -199,3 +226,15 @@ class WorkTimesheetLine(models.Model):
                 rec.allowed_employee_ids = allocations.mapped('employee_id')
             else:
                 rec.allowed_employee_ids = False
+
+    @api.depends('no_of_vehicle','hours','operator_hours')
+    def _compute_total_cost(self):
+        for rec in self:
+            rec.total_hours = 0.0
+            if rec.timesheet_id.project_id:
+                if rec.timesheet_id.project_id.operator_included =='no':
+                    total_hours = rec.hours * rec.no_of_vehicle * rec.timesheet_id.project_id.rental_rate_hourly
+                    operator_cost = rec.operator_hours * rec.timesheet_id.project_id.operator_cost
+                    rec.total_hours = total_hours + operator_cost
+                else:
+                    rec.total_hours = rec.hours * rec.no_of_vehicle * rec.timesheet_id.project_id.rental_rate_hourly

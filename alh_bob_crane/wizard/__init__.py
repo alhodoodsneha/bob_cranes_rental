@@ -25,3 +25,4 @@ from . import lpo_adding_wizard
 from . import job_card_adding_wizad
 from . import hse_checklist_wizard
 from . import loading_equipment_wizard
+from . import timesheet_print_wizard

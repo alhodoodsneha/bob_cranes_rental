@@ -108,3 +108,25 @@ class ProjectTaskLoadingAssignWizard(models.TransientModel):
     def action_assign_to(self):
         project_task = self.env['project.task'].browse(self.env.context['active_id'])
         project_task.write({'user_ids': [(6, 0, self.assign_to.ids)]})
+
+class ProjectTaskDemobilizationAssignWizard(models.TransientModel):
+    _name = 'project.assign.demobilization.wizard'
+    _description = "Demobilization Task Assign To"
+
+    assign_to = fields.Many2many(
+        'res.users',
+        'project_assign_demobilization_wizard_rel',
+        'demobilization__id',
+        'demobilization_user_id',
+        string='Assign To',
+        domain=lambda self: [
+            ('group_ids', 'in', [
+                self.env.ref('alh_bob_crane.group_loading_group_manager').id,
+                self.env.ref('alh_bob_crane.group_loading_user').id,
+            ])
+        ]
+    )
+
+    def action_assign_to(self):
+        project_task = self.env['project.task'].browse(self.env.context['active_id'])
+        project_task.write({'user_ids': [(6, 0, self.assign_to.ids)]})

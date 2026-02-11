@@ -55,13 +55,16 @@
         <field name="model">fleet.vehicle</field>
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='driver_id']" position="before">
-                    <field name="account_asset_id" readonly="1" context="{'default_vehicle_id': id}"/>
-                    <field name="depreciation_account" required="1" context="{'default_vehicle_id': id}"/>
-                    <field name="expense_account" required="1" context="{'default_vehicle_id': id}"/>
-                    <field name="type_equipment_id" required="1" context="{'default_vehicle_id': id}"/>
-                    <field name="project_loc" required="1" />
+            <xpath expr="//field[@name='driver_id']" position="attributes">
+                <attribute name="string">Driver/Operator</attribute>
             </xpath>
+             <xpath expr="//sheet/group/group" position="attributes">
+                   <attribute name="string">Details</attribute>
+             </xpath>
+             <xpath expr="//field[@name='driver_id']" position="after">
+                   <field name="rent_per_day"/>
+                   <field name="is_available"/>
+             </xpath>
              <xpath expr="//page[@name='page_tax_info']" position="after">
                  <page string="Technical Specification" name="technical_specification_page">
                         <field name="specification_line_ids">
@@ -99,8 +102,32 @@
                         </group>
                 </page>
              </xpath>
+               <xpath expr="//page[@name='note']" position="after">
+                    <page string="Other Info" name="other_info">
+                        <group>
+                            <group>
+                                 <field name="account_asset_id" readonly="1" context="{'default_vehicle_id': id}"/>
+                                <field name="depreciation_account" required="1" context="{'default_vehicle_id': id}"/>
+                                <field name="expense_account" required="1" context="{'default_vehicle_id': id}"/>
+                                <field name="type_equipment_id" required="1" context="{'default_vehicle_id': id}"/>
+                                <field name="project_loc" required="1" />
+                            </group>
+                        </group>
+                    </page>
+               </xpath>
         </field>
     </record>
+
+     <record id="fleet_vehicle_view_tree_inherited_bob_creane" model="ir.ui.view">
+        <field name="name">fleet.vehicle.view.list.inherit.bobcrane</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_tree"/>
+        <field name="arch" type="xml">
+              <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="type_equipment_id"/>
+              </xpath>
+        </field>
+     </record>
 
 
     <record id="fleet_vehicle_model_view_form_inherited_bob_creane" model="ir.ui.view">
@@ -113,6 +140,36 @@
                </xpath>
         </field>
     </record>
+
+
+    <record id='fleet_vehicle_state_view_tree_inherited_bob_crane' model='ir.ui.view'>
+        <field name="name">fleet.vehicle.state.list.bob.crane</field>
+        <field name="model">fleet.vehicle.state</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_state_view_tree"/>
+         <field name="arch" type="xml">
+              <xpath expr="//field[@name='name']" position="after">
+                   <field name="is_available"/>
+                   <field name="on_job"/>
+                   <field name="maintenance"/>
+                   <field name="reserved"/>
+              </xpath>
+         </field>
+    </record>
+
+    <record id='fleet_vehicle_state_view_form_inherited_bob_crane' model='ir.ui.view'>
+        <field name="name">fleet.vehicle.state.form.bob.crane</field>
+        <field name="model">fleet.vehicle.state</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_state_view_form"/>
+        <field name="arch" type="xml">
+              <xpath expr="//field[@name='name']" position="after">
+                   <field name="is_available"/>
+                   <field name="on_job"/>
+                   <field name="maintenance"/>
+                   <field name="reserved"/>
+              </xpath>
+        </field>
+    </record>
+
 
 
 </odoo>

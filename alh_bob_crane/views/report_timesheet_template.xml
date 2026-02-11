@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_timesheet_worked_report">
+           <t t-call="web.html_container">
+        <t t-call="web.basic_layout">
+              <div t-attf-class="header">
+                    <div class="row">
+                        <div class="col-5" style="text-align: left;">
+                            <div class="company-logo" style="text-align: left;">
+                                <img t-if="env.company.logo" t-att-src="image_data_uri(env.company.logo)"
+                                     style="max-height: 99px;align-content:center !important;width:180px;"
+                                     alt="Logo"/>
+                            </div>
+                        </div>
+                        <div class="col-7" style="text-align: right;">
+                            <div class="company-info">
+                                <ul class="list-unstyled" style="font-size:14px;">
+                                    <li>
+                                        <span t-esc="env.company.partner_id.name"/>
+                                    </li>
+                                    <li>
+                                        <span t-esc="env.company.partner_id.street"/>
+                                    </li>
+                                    <li>
+                                        <span t-esc="env.company.partner_id.state_id.name"/>,
+                                        <span t-esc="env.company.partner_id.country_id.name"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="border-top: 1px solid lightgray; margin-bottom: 10px;"></div>
+                </div>
+         <div class="mt-0">
+             <div class="page">
+                <h2 class="text-center">
+                    Timesheet for – <t t-esc="project_id"/> on  <t t-esc="start_date"/> - <t t-esc="end_date"/>
+                </h2>
+                  <div class="oe_structure"></div>
+                 <br></br>
+                <table class="table table-sm table-bordered"
+                       style="font-size:13px;width:100%;border-collapse: collapse;border:1px solid #000;">
+
+                        <tr style="border:1px solid #000;background-color:#FBE2D5;">
+                            <th style="border:1px solid #000;font-weight:700;" class="text-center" width="20%"><strong>Date</strong></th>
+                            <th style="border:1px solid #000;font-weight:700;"  class="text-center" width="20%"><strong>No Of Vehicle</strong></th>
+                            <th style="border:1px solid #000;font-weight:700;"  class="text-center" width="20%"><strong>Total Worked Hours</strong></th>
+                            <th style="border:1px solid #000;font-weight:700;" class="text-center"  width="20%"><strong>Operator Hours</strong></th>
+                            <th style="border:1px solid #000;font-weight:700;" class="text-center"  width="20%"><strong>Total Cost</strong></th>
+                        </tr>
+                    <tbody style="border:1px solid #000;">
+                        <t t-foreach="docs" t-as="line">
+                            <tr style="page-break-inside: avoid;border:1px solid #000;">
+                                <td class="text-center" style="border:1px solid #000;"><t t-esc="line.date"/></td>
+                                <td class="text-center" style="border:1px solid #000;"><t t-esc="line.no_of_vehicle"/></td>
+                                <td class="text-center" style="border:1px solid #000;"><t t-esc="line.hours"/></td>
+                                <td class="text-center" style="border:1px solid #000;"><t t-esc="line.operator_hours"/></td>
+                                <td class="text-center" style="border:1px solid #000;"><t t-esc="line.total_hours"/></td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td class="text-center" style="border:1px solid #000;font-weight:700;" colspan="4"><strong>Total Amount</strong></td>
+                            <td class="text-center" style="border:1px solid #000;font-weight:700;"><strong><t t-esc="total_amount"/></strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+            <div t-attf-class="footer o_standard_footer">
+                    <div class="text-center">
+                        <div style="border-top: 2px solid black; margin-bottom: 10px;"></div>
+                        <div t-if="report_type == 'pdf'" class="text-muted">
+                            Page:
+                            <span class="page"/>
+                            of
+                            <span class="topage"/>
+                        </div>
+                    </div>
+                </div>
+        </t>
+           </t>
+    </template>
+</odoo>

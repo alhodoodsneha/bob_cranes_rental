@@ -13,6 +13,8 @@
                   <field name="_is_loading_task" invisible="1"/>
                   <field name="_is_hse_task" invisible="1"/>
                   <field name="is_completed" invisible="1"/>
+                  <field name="_is_de_mobilization__task" invisible="1"/>
+                  <field name="is_completed_demobilization" invisible="1"/>
                   <field name="is_completed_verification" invisible="1"/>
                   <field name="crm_lead_id" readonly="1"/>
             </xpath>
@@ -82,9 +84,19 @@
                         string="Loading" class="btn-primary"
                         invisible="_is_loading_task == False or is_completed_loading == True"
                 />
+
+                <button name="action_unloading_task" type="object"
+                        string="Un Loading" class="btn-primary"
+                        invisible="_is_de_mobilization__task == False or is_completed_demobilization == True"
+                />
                 <button name="action_complete_loading" type="object"
-                        string="Complete Loading" class="btn-primary"
+                        string="Complete Mobilization" class="btn-primary"
                         invisible="_is_loading_task == False or is_completed_loading == True"
+                />
+
+                 <button name="action_complete_unloading" type="object"
+                        string="Complete Demobilization" class="btn-primary"
+                        invisible="_is_de_mobilization__task == False or is_completed_demobilization == True"
                 />
                  <button name="action_assign_transport_to" type="object"
                         string="Re Assign" class="btn-primary"
@@ -93,6 +105,11 @@
                   <button name="action_assign_loading_to" type="object"
                         string="Re Assign" class="btn-primary"
                         invisible="_is_loading_task == False or is_completed_loading == True" groups="alh_bob_crane.group_loading_group_manager"
+                />
+
+                 <button name="action_assign_demobilization_to" type="object"
+                        string="Re Assign" class="btn-primary"
+                        invisible="_is_de_mobilization__task == False or is_completed_demobilization == True" groups="alh_bob_crane.group_loading_group_manager"
                 />
             </xpath>
              <xpath expr="//page[@name='description_page']" position="before">
@@ -116,6 +133,22 @@
                  <page name="equipment_loading_line" string="Equipment Loading Items" invisible="_is_loading_task == False">
                         <field name="equipment_loading_line_ids" widget="one2many" readonly="1">
                             <list string="Loading Equipment" editable="bottom" >
+                                <field name="task_id" column_invisible="1"/>
+                                <field name="project_id" column_invisible="1"/>
+                                <field name="equipment_allocation_id" column_invisible="1"/>
+                                <field name="equipment_id" readonly="1"/>
+                                <field name="start_date" readonly="1"/>
+                                <field name="end_date" readonly="1"/>
+                                <field name="qty" column_invisible="1"/>
+                                <field name="status_updated" readonly="1"/>
+                                <field name="updated_by" readonly="1"/>
+                                <field name="updated_on" readonly="1"/>
+                            </list>
+                        </field>
+                 </page>
+                 <page name="equipment_loading_line_unload" string="Equipment Un Loading Items" invisible="_is_de_mobilization__task == False">
+                        <field name="equipment_loading_line_ids" widget="one2many" readonly="1">
+                            <list string="Un Loading Equipment" editable="bottom" >
                                 <field name="task_id" column_invisible="1"/>
                                 <field name="project_id" column_invisible="1"/>
                                 <field name="equipment_allocation_id" column_invisible="1"/>
@@ -198,7 +231,7 @@
 
 
      <record id="action_loading_task" model="ir.actions.act_window">
-        <field name="name">Loading Task</field>
+        <field name="name">Mobilization Task</field>
         <field name="res_model">project.task</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="project.view_task_search_form"/>
@@ -208,7 +241,21 @@
             1,'create': True,'delete': False,}
         </field>
         <field name="help" type="html">
-            <p>View Loading Task</p>
+            <p>View Mobilization Task</p>
+        </field>
+    </record>
+
+    <record id="action_demobilization_task" model="ir.actions.act_window">
+        <field name="name">Demobilization Task</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="project.view_task_search_form"/>
+        <field name="domain">[('_is_de_mobilization__task', '=', True)]</field>
+        <field name="context">{'default__is_de_mobilization__task':True,
+            'search_default_open_tasks': 1,'create': True,'delete': False,}
+        </field>
+        <field name="help" type="html">
+            <p>View Demobilization Task</p>
         </field>
     </record>
 
@@ -239,9 +286,18 @@
     />
 
      <menuitem
-            name="Loading Task"
+            name="Mobilization Task"
             id="menu_loading_task"
             action="action_loading_task"
+            parent="project.menu_main_pm"
+            groups="alh_bob_crane.group_loading_user,alh_bob_crane.group_loading_group_manager"
+            sequence="8"
+    />
+
+     <menuitem
+            name="Demobilization Task"
+            id="menu_demobilization_task"
+            action="action_demobilization_task"
             parent="project.menu_main_pm"
             groups="alh_bob_crane.group_loading_user,alh_bob_crane.group_loading_group_manager"
             sequence="8"

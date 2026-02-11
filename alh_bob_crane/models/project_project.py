@@ -18,6 +18,8 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+from email.policy import default
+
 from odoo import api, models, fields,_
 from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
@@ -175,6 +177,11 @@ class Project(models.Model):
         string="Fuel Included"
     )
 
+    is_job_work = fields.Boolean(
+        string="Is JOb Work",
+        default=False
+    )
+
     @api.model
     def create(self, vals):
         res = super(Project, self).create(vals)
@@ -277,7 +284,7 @@ class Project(models.Model):
 
     def action_open_loading_task(self):
         return {
-            'name': 'Loading',
+            'name': 'Mobilization',
             'view_type': 'list',
             'view_mode': 'list,form',
             'res_model': 'project.task',
@@ -286,6 +293,20 @@ class Project(models.Model):
             'type': 'ir.actions.act_window',
             'context': {'default_project_id': self.id,
                         'default__is_loading_task': True
+                        }
+        }
+
+    def action_open_un_loading_task(self):
+        return {
+            'name': 'De Mobilization',
+            'view_type': 'list',
+            'view_mode': 'list,form',
+            'res_model': 'project.task',
+            'domain': [('project_id', '=', self.id),
+                       ('_is_de_mobilization__task', '=', True)],
+            'type': 'ir.actions.act_window',
+            'context': {'default_project_id': self.id,
+                        'default__is_de_mobilization__task': True
                         }
         }
 
@@ -324,7 +345,7 @@ class Project(models.Model):
 
     def action_loading_equipments(self):
         task_id = self.env['project.task'].create({
-            'name': 'Loading-' + str(self.name),
+            'name': 'Mobilization-' + str(self.name),
             'user_ids': [(6, 0, [self.env.user.id])],
             'project_id': self.id,
             'crm_lead_id': self.crm_lead_id.sudo().id,
@@ -332,13 +353,33 @@ class Project(models.Model):
             '_is_loading_task': True,
         })
         return {
-            'name': 'Loading',
+            'name': 'Mobilization',
             'view_type': 'list',
             'view_mode': 'list,form',
             'res_model': 'project.task',
             'domain': [('id', '=', task_id.id)],
             'type': 'ir.actions.act_window',
             'context': {'default_project_id': self.id, 'default__is_loading_task': True}
+        }
+
+    def action_demobilization_equipments(self):
+        task_id = self.env['project.task'].create({
+            'name': 'DeMobilization-' + str(self.name),
+            'user_ids': [(6, 0, [self.env.user.id])],
+            'project_id': self.id,
+            'crm_lead_id': self.crm_lead_id.sudo().id,
+            'date_deadline': fields.Datetime.now(),
+            '_is_de_mobilization__task': True,
+        })
+        return {
+            'name': 'DeMobilization',
+            'view_type': 'list',
+            'view_mode': 'list,form',
+            'res_model': 'project.task',
+            'domain': [('id', '=', task_id.id)],
+            'type': 'ir.actions.act_window',
+            'context': {'default_project_id': self.id,
+                        'default__is_de_mobilization__task': True}
         }
 
     def action_view_project_vehicles(self):
@@ -418,7 +459,7 @@ class EquipmentAllocation(models.Model):
     equipment_id = fields.Many2one(
         'fleet.vehicle',
         string='Equipment',
-        domain="[('type_equipment_id','in',['equipment','lifting','trailers'])]"
+        domain="[('type_equipment_id','in',['equipment','lifting','trailers']),('is_available','=',True)]"
     )
     start_date = fields.Datetime(required=True,
                                  string="Start Date")
@@ -450,6 +491,38 @@ class EquipmentAllocation(models.Model):
         default=False
     )
 
+    rent_per_day = fields.Float(
+        string="Agreed Rent Per day",
+        default=0.0
+    )
+
+    as_of_today = fields.Float(
+        string="As Of Today",
+        compute='_compute_as_of_today'
+    )
+
+    @api.onchange('equipment_id')
+    def _on_change_equipment_id(self):
+        if self.equipment_id.rent_per_day:
+            self.rent_per_day = self.equipment_id.rent_per_day
+
+
+    @api.depends('start_date','end_date','rent_per_day','project_id')
+    def _compute_as_of_today(self):
+        for rec in self:
+            rec.as_of_today = 0.0
+            if not rec.start_date:
+                continue
+            start_date = rec.start_date.date()
+            today = fields.Date.today()
+            if rec.end_date and rec.end_date.date() < today:
+                calculation_end = rec.end_date.date()
+            else:
+                calculation_end = today
+            if start_date <= calculation_end:
+                days = (calculation_end - start_date).days + 1
+                rec.as_of_today = days * rec.rent_per_day
+
     @api.constrains('equipment_id', 'start_date', 'end_date')
     def _check_equipment_overlap(self):
         for rec in self:
@@ -475,6 +548,12 @@ class EquipmentAllocation(models.Model):
                                     conflict.end_date
                                 ))
 
+    def unlink(self):
+        for record in self:
+            if record.loading_status != 'waiting':
+                raise UserError(
+                    _("You Can't delete line , equipment is already loaded !!"))
+            return super(EquipmentAllocation, self).unlink()
 
 class ManpowerAllocation(models.Model):
     _name = 'manpower.allocation'

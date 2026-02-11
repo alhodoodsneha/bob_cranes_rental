@@ -61,7 +61,7 @@ class LoadingEquipmentWizard(models.TransientModel):
         status_map = {
             'loading': 'waiting',
             'installing': 'loading',
-            'unloading': 'installed',
+            'unloading': 'loading',
         }
         for wizard in self:
             status = status_map.get(wizard.type_load)
@@ -81,7 +81,7 @@ class LoadingEquipmentWizard(models.TransientModel):
         if not self.equipment_ids:
             raise UserError("Please Choose The Equipments !!")
         if not self.project_id.project_loc.sudo().id:
-            raise UserError("Please Choose The Project Location !!")
+            raise UserError("Please Choose The Project Location in project!!")
         for rec in self.equipment_ids:
             if self.type_load == 'loading':
                 rec.loading_status = 'loading'
@@ -119,7 +119,11 @@ class LoadingEquipmentWizard(models.TransientModel):
                     'source_location_id': rec.equipment_id.project_loc.sudo().id,
                     'destination_location_id': self.project_id.project_loc.sudo().id,
                 })
+                state = self.env['fleet.vehicle.state'].sudo().search([('on_job','=',True)])
                 rec.equipment_id.project_loc = self.project_id.project_loc.id
+                if state:
+                    rec.equipment_id.state_id = state.id
+
             if self.type_load == 'unloading':
                 warehouse = self.env['stock.warehouse'].sudo().search([
                     ('company_id', '=', rec.equipment_id.company_id.id)
@@ -130,4 +134,8 @@ class LoadingEquipmentWizard(models.TransientModel):
                         'source_location_id': self.project_id.project_loc.sudo().id,
                         'destination_location_id': warehouse.lot_stock_id.id,
                     })
+                    state = self.env['fleet.vehicle.state'].sudo().search(
+                        [('is_available', '=', True)])
                     rec.equipment_id.project_loc = warehouse.lot_stock_id.id
+                    if state:
+                        rec.equipment_id.state_id = state.id

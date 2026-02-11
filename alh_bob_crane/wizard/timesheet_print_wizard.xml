@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <record id="timesheet_report_wizard_form_view" model="ir.ui.view">
+        <field name="name">timesheet.report.wizard.form.view</field>
+        <field name="model">timesheet.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Timesheet Report">
+                <group>
+                  <group>
+                          <field name="start_date" required="1"/>
+                          <field name="end_date" required="1"/>
+                  </group>
+                    <group>
+                         <field name="project_id" required="1"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="print_timesheet_report" type="object"
+                            string="Print" class="btn-primary"/>
+                    <button special="cancel" data-hotkey="z" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_timesheet_report_wizard_wizard" model="ir.actions.act_window">
+        <field name="name">Timesheet Report</field>
+        <field name="res_model">timesheet.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="timesheet_report_wizard_form_view"/>
+    </record>
+
+
+    <menuitem
+            name="Timesheet Report"
+            id="menu_work_timesheet_report"
+            action="action_timesheet_report_wizard_wizard"
+            groups="hr_timesheet.group_hr_timesheet_user"
+            parent="alh_bob_crane.menu_work_timesheet_main_menu"
+            sequence="7"
+    />
+
+
+</odoo>
