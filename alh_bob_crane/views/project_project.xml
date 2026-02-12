@@ -270,6 +270,7 @@
                 date_start="start_date"
                 date_stop="end_date"
                 string="Equipment Planning"
+                 color="equipment_id"
                 default_group_by="project_id">
                 <field name="equipment_id"/>
             </gantt>
@@ -283,6 +284,7 @@
             <gantt
                 date_start="start_date"
                 date_stop="end_date"
+                color="job_id"
                 string="Manpower Planning" default_group_by="project_id">
                 <field name="job_id"/>
             </gantt>
@@ -458,6 +460,7 @@
                 string="Equipment Planning"
                 date_start="start_date"
                 date_stop="end_date"
+                color="equipment_id"
                 default_group_by="equipment_id">
                 <field name="equipment_id"/>
                 <field name="project_id"/>
@@ -528,6 +531,7 @@
                 string="Manpower Planning"
                 date_start="start_date"
                 date_stop="end_date"
+                color="employee_id"
                 default_group_by="employee_id">
                 <field name="employee_id"/>
                 <field name="job_id"/>
