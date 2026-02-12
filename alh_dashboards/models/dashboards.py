@@ -21,7 +21,7 @@
 #############################################################################
 from odoo import models, api, fields
 from datetime import date
-
+from collections import defaultdict
 
 class ProjectDashboard(models.Model):
     _name = "project.dashboard"
@@ -287,3 +287,322 @@ class ProjectDashboard(models.Model):
             "vehicles":vehicle_list
         }
 
+
+    """Customer Dashboard"""
+    @api.model
+    def customer_dashboard(self):
+
+        partners = self.env['res.partner']\
+                .with_context(active_test=False)\
+                .search([])
+        orders = self.env['sale.order'].sudo().search([('state', '=', 'sale')])
+
+        total_customers = len(partners)
+        active_customers = len(partners.filtered(lambda p: p.active))
+        inactive_customers = total_customers - active_customers
+        total_revenue = sum(orders.mapped('amount_total'))
+
+        avg_order = total_revenue / len(orders) if orders else 0
+        lifetime_value = total_revenue / total_customers if total_customers else 0
+
+        # KPI Cards
+        kpi_cards = [
+            {"label": "Total Customers", "value": total_customers, "color": "linear-gradient(45deg,#4e73df,#224abe)"},
+            {"label": "Active Customers", "value": active_customers, "color": "linear-gradient(45deg,#1cc88a,#13855c)"},
+            {"label": "Inactive Customers", "value": inactive_customers,
+             "color": "linear-gradient(45deg,#e74a3b,#be2617)"},
+            {"label": "Total Revenue", "value": round(total_revenue, 2),
+             "color": "linear-gradient(45deg,#f6c23e,#dda20a)"},
+            {"label": "Avg Order Value", "value": round(avg_order, 2),
+             "color": "linear-gradient(45deg,#36b9cc,#258391)"},
+            {"label": "Lifetime Value", "value": round(lifetime_value, 2),
+             "color": "linear-gradient(45deg,#858796,#60616f)"},
+        ]
+
+        # Growth Data
+        growth = defaultdict(int)
+        for p in partners:
+            month = p.create_date.strftime("%b")
+            growth[month] += 1
+
+        growth_data = {
+            "labels": list(growth.keys()),
+            "datasets": [{
+                "label": "New Customers",
+                "data": list(growth.values()),
+                "borderColor": "#4e73df",
+                "fill": True
+            }]
+        }
+
+        # Revenue Trend
+        trend = defaultdict(float)
+        for o in orders:
+            month = o.date_order.strftime("%b")
+            trend[month] += o.amount_total
+
+        revenue_trend = {
+            "labels": list(trend.keys()),
+            "datasets": [{
+                "label": "Revenue",
+                "data": list(trend.values()),
+                "borderColor": "#1cc88a",
+                "fill": True
+            }]
+        }
+
+        # Category Data
+        category = defaultdict(int)
+        for p in partners:
+            cat = p.category_id.name if p.category_id else "Other"
+            category[cat] += 1
+
+        category_data = {
+            "labels": list(category.keys()),
+            "datasets": [{
+                "data": list(category.values()),
+                "backgroundColor": ["#4e73df", "#1cc88a", "#f6c23e", "#e74a3b", "#36b9cc"]
+            }]
+        }
+
+        # Top Customers
+        revenue_dict = defaultdict(float)
+        for o in orders:
+            revenue_dict[o.partner_id.name] += o.amount_total
+
+        sorted_rev = sorted(revenue_dict.items(), key=lambda x: x[1], reverse=True)[:5]
+
+        top_customer_data = {
+            "labels": [x[0] for x in sorted_rev],
+            "datasets": [{
+                "label": "Revenue",
+                "data": [x[1] for x in sorted_rev],
+                "backgroundColor": "#4e73df"
+            }]
+        }
+
+        recent_customers = [{
+            "name": p.name,
+            "email": p.email,
+            "phone": p.phone
+        } for p in partners.sorted(key=lambda r: r.create_date, reverse=True)[:5]]
+
+        no_order_customers = [{
+            "name": p.name,
+            "email": p.email
+        } for p in partners if not orders.filtered(lambda o: o.partner_id == p)][:5]
+
+        # -------------------------------------------------
+        # CUSTOMER TABLE DATA
+        # -------------------------------------------------
+
+        customers = []
+
+        for p in partners:
+            customers.append({
+                "id": p.id,
+                "name": p.name,
+                "email": p.email,
+                "phone": p.phone,
+                "salesperson": p.user_id.name if p.user_id else "",
+                "total_invoiced": round(p.sudo().total_invoiced or 0.0, 2),
+                "total_due": round(p.sudo().total_due or 0.0, 2),
+                "active": p.active,
+            })
+
+        return {
+            "kpi_cards": kpi_cards,
+            "growth_data": growth_data,
+            "revenue_trend": revenue_trend,
+            "category_data": category_data,
+            "top_customer_data": top_customer_data,
+            "recent_customers": recent_customers,
+            "no_order_customers": no_order_customers,
+            "customers": customers
+        }
+
+
+    """Employee Dashboard"""
+    @api.model
+    def get_employee_dashboard_data(self):
+
+        today = fields.Date.today()
+        first_day = today.replace(day=1)
+
+        Employee = self.env['hr.employee'].sudo()
+        Timesheet = self.env['account.analytic.line'].sudo()
+        Department = self.env['hr.department'].sudo()
+
+        # ==============================
+        # EMPLOYEE DATA
+        # ==============================
+
+        employees = Employee.with_context(active_test=False).search([])
+
+        total_employees = len(employees)
+        active_employees = len(employees.filtered(lambda e: e.active))
+        inactive_employees = total_employees - active_employees
+        total_departments = Department.search_count([])
+
+        # ==============================
+        # TIMESHEET DATA (THIS MONTH)
+        # ==============================
+
+        timesheets = Timesheet.search([
+            ('date', '>=', first_day),
+            ('date', '<=', today),
+        ])
+
+        total_hours = sum(timesheets.mapped('unit_amount'))
+
+        billable_timesheets = timesheets.filtered(lambda l: l.so_line)
+        billable_hours = sum(billable_timesheets.mapped('unit_amount'))
+
+        non_billable_hours = total_hours - billable_hours
+
+        utilization = 0
+        if total_hours:
+            utilization = round((billable_hours / total_hours) * 100, 2)
+
+        # ==============================
+        # EMPLOYEE HOURS SUMMARY
+        # ==============================
+
+        employee_data = []
+        employee_hours_map = {}
+
+        for emp in employees:
+            emp_timesheets = timesheets.filtered(lambda l: l.employee_id.id == emp.id)
+
+            emp_total = sum(emp_timesheets.mapped('unit_amount'))
+            emp_billable = sum(
+                emp_timesheets.filtered(lambda l: l.so_line).mapped('unit_amount')
+            )
+
+            employee_hours_map[emp.name] = emp_total
+
+            employee_data.append({
+                "id": emp.id,
+                "name": emp.name,
+                "department": emp.department_id.name if emp.department_id else '',
+                "job": emp.job_title or '',
+                "total_hours": round(emp_total, 2),
+                "billable_hours": round(emp_billable, 2),
+                "active": emp.active,
+            })
+
+        # ==============================
+        # TOP 5 EMPLOYEES
+        # ==============================
+
+        top_employees = sorted(
+            employee_hours_map.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )[:5]
+
+        # ==============================
+        # DEPARTMENT SUMMARY
+        # ==============================
+
+        dept_labels = []
+        dept_counts = []
+
+        departments = Department.search([])
+
+        for dept in departments:
+            dept_labels.append(dept.name)
+            dept_counts.append(
+                len(employees.filtered(lambda e: e.department_id.id == dept.id))
+            )
+
+        # ==============================
+        # MONTHLY HOURS (LAST 6 MONTHS)
+        # ==============================
+
+        monthly_labels = []
+        monthly_hours = []
+
+        for i in range(6):
+            month_start = fields.Date.add(first_day, months=-i)
+            month_end = fields.Date.end_of(month_start, 'month')
+
+            month_ts = Timesheet.search([
+                ('date', '>=', month_start),
+                ('date', '<=', month_end),
+            ])
+
+            monthly_labels.insert(0, month_start.strftime("%b %Y"))
+            monthly_hours.insert(0, sum(month_ts.mapped('unit_amount')))
+
+        # ==============================
+        # RETURN DATA
+        # ==============================
+        return {
+            "total_employees": total_employees,
+            "active_employees": active_employees,
+            "inactive_employees": inactive_employees,
+            "total_departments": total_departments,
+            "total_hours": round(total_hours, 2),
+            "billable_hours": round(billable_hours, 2),
+            "non_billable_hours": round(non_billable_hours, 2),
+            "utilization": utilization,
+            "employees": employee_data,
+            "top_employee_labels": [x[0] for x in top_employees],
+            "top_employee_hours": [x[1] for x in top_employees],
+            "department_labels": dept_labels,
+            "department_counts": dept_counts,
+            "monthly_labels": monthly_labels,
+            "monthly_hours": monthly_hours,
+        }
+
+    @api.model
+    def get_crm_dashboard_data(self):
+
+        leads = self.env['crm.lead'].sudo().search([])
+
+        total_leads = len(leads)
+        opportunities = len(leads.filtered(lambda l: l.type == 'opportunity'))
+        won = len(leads.filtered(lambda l: l.stage_id.is_won))
+        lost = len(leads.filtered(lambda l: l.active is False))
+
+        # Stage Distribution
+        stage_data = defaultdict(int)
+        for lead in leads:
+            stage_data[lead.stage_id.name] += 1
+
+        # Monthly Revenue
+        revenue_data = defaultdict(float)
+        for lead in leads.filtered(lambda l: l.stage_id.is_won):
+            month = lead.create_date.strftime("%b")
+            revenue_data[month] += lead.expected_revenue
+
+        # Top Salespersons
+        salespersons = defaultdict(lambda: {
+            "name": "",
+            "total": 0,
+            "won": 0,
+            "revenue": 0,
+        })
+
+        for lead in leads:
+            user = lead.user_id.name or "No Salesperson"
+            salespersons[user]["name"] = user
+            salespersons[user]["total"] += 1
+            if lead.stage_id.is_won:
+                salespersons[user]["won"] += 1
+                salespersons[user]["revenue"] += lead.expected_revenue
+
+        top_salespersons = list(salespersons.values())
+
+        return {
+            "kpis": {
+                "total_leads": total_leads,
+                "opportunities": opportunities,
+                "won": won,
+                "lost": lost,
+            },
+            "stage_data": dict(stage_data),
+            "revenue_data": dict(revenue_data),
+            "top_salespersons": top_salespersons,
+        }

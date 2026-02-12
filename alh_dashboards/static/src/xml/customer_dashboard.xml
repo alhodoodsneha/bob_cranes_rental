@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+<t t-name="alh_dashboards.customer_dashboard">
+
+<div class="container-fluid p-4 bg-light">
+
+<style>
+     html, body {
+        height: auto !important;
+        overflow-y: auto !important;
+    }
+    .badge-active {
+        background: #1cc88a;
+    }
+    .badge-inactive {
+        background: #e74a3b;
+    }
+.dashboard-card {
+    border-radius: 18px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+.kpi-number {
+    font-size: 26px;
+    font-weight: 700;
+}
+.kpi-title {
+    font-size: 13px;
+    opacity: 0.8;
+}
+.table thead {
+    background: #0d6efd;
+    color: white;
+}
+canvas {
+    height: 300px !important;
+}
+</style>
+
+<h2 class="mb-4 text-primary fw-bold">Customer 360° Analytics Dashboard</h2>
+
+<!-- KPI ROW -->
+<div class="row mb-4">
+
+    <t t-foreach="state.kpi_cards" t-as="k" t-key="k">
+        <div class="col-md-2 mb-3">
+            <div class="dashboard-card text-white" t-att-style="'background:'+k.color">
+                <div class="kpi-number"><t t-esc="k.value"/></div>
+                <div class="kpi-title"><t t-esc="k.label"/></div>
+            </div>
+        </div>
+    </t>
+
+</div>
+
+<!-- CHARTS ROW 1 -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <h5>Customer Growth</h5>
+            <canvas id="growthChart"/>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <h5>Revenue Trend</h5>
+            <canvas id="revenueTrendChart"/>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS ROW 2 -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <h5>Customer Categories</h5>
+            <canvas id="categoryChart"/>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <h5>Status Distribution</h5>
+            <canvas id="statusChart"/>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <h5>Top Customers</h5>
+            <canvas id="topCustomerChart"/>
+        </div>
+    </div>
+</div>
+
+    <div class="dashboard-card mb-4">
+
+    <h4 class="section-title mb-3">Customers Overview</h4>
+
+    <!-- ================= SEARCH + PAGE SIZE ================= -->
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Search customer..."
+                   t-model="state.searchQuery"/>
+        </div>
+
+        <div class="col-md-6">
+            <select class="form-select"
+                    t-model="state.pageSize">
+                <option value="5">5 per page</option>
+                <option value="10">10 per page</option>
+                <option value="20">20 per page</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ================= TABLE ================= -->
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Salesperson</th>
+                    <th>Total Invoiced</th>
+                    <th>Total Due</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <t t-foreach="paginatedCustomers" t-as="cust" t-key="cust.id">
+
+                    <tr>
+                        <td><strong><t t-esc="cust.name"/></strong></td>
+                        <td><t t-esc="cust.email or '-'"/></td>
+                        <td><t t-esc="cust.phone or '-'"/></td>
+                        <td><t t-esc="cust.salesperson or '-'"/></td>
+                        <td class="text-success fw-bold">
+                            ₹ <t t-esc="cust.total_invoiced"/>
+                        </td>
+                        <td class="text-danger fw-bold">
+                            ₹ <t t-esc="cust.total_due"/>
+                        </td>
+                        <td>
+                            <span t-att-class="cust.active ? 'badge bg-success' : 'badge bg-danger'">
+                                <t t-esc="cust.active ? 'Active' : 'Inactive'"/>
+                            </span>
+                        </td>
+                    </tr>
+
+                </t>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= PAGINATION ================= -->
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+
+        <button class="btn btn-outline-primary"
+                t-on-click="prevPage"
+                t-att-disabled="state.currentPage === 1">
+            Previous
+        </button>
+
+        <span>
+            Page <t t-esc="state.currentPage"/> /
+            <t t-esc="totalPages"/>
+        </span>
+
+        <button class="btn btn-outline-primary"
+                t-on-click="nextPage"
+                t-att-disabled="state.currentPage === totalPages">
+            Next
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- TABLES -->
+<div class="row">
+
+    <div class="col-md-6 mb-4">
+        <div class="dashboard-card">
+            <h5>Recent Customers</h5>
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="state.recent_customers" t-as="c" t-key="c">
+                        <tr>
+                            <td><t t-esc="c.name"/></td>
+                            <td><t t-esc="c.email"/></td>
+                            <td><t t-esc="c.phone"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="dashboard-card">
+            <h5>Customers Without Orders</h5>
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="state.no_order_customers" t-as="c" t-key="c">
+                        <tr>
+                            <td><t t-esc="c.name"/></td>
+                            <td><t t-esc="c.email"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</div>
+</t>
+</templates>

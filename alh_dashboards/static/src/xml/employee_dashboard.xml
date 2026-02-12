@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+<t t-name="alh_dashboards.employee_dashboard">
+
+<div class="container-fluid p-4 dashboard-bg">
+
+<style>
+    html, body {
+        height: auto !important;
+        overflow-y: auto !important;
+    }
+    .chart-container {
+    position: relative;
+    height: 320px;
+    width: 100%;
+}
+.dashboard-bg {
+    background: #f4f6fb;
+    min-height: 100vh;
+}
+
+.dashboard-title {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* KPI Cards */
+.kpi-card {
+    border-radius: 18px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+.kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* Chart Card */
+.chart-card {
+    border-radius: 18px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+/* Table */
+.table-card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+.table-card table th {
+    background: #eef2ff;
+    font-weight: 600;
+}
+.table-card table td,
+.table-card table th {
+    border: none;
+    padding: 12px;
+}
+.table-card table tbody tr:hover {
+    background: #f7f9ff;
+}
+.badge-active { background: #22c55e; }
+.badge-inactive { background: #ef4444; }
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+</style>
+
+<h2 class="mb-4 dashboard-title">Advanced HR &amp; Timesheet Dashboard</h2>
+
+<!-- KPI ROW -->
+<div class="row mb-4">
+
+    <div class="col-md-2">
+        <div class="kpi-card">
+            <div>Total Employees</div>
+            <div class="kpi-value text-primary">
+                <t t-esc="state.total_employees"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="kpi-card">
+            <div>Total Hours (Month)</div>
+            <div class="kpi-value text-success">
+                <t t-esc="state.total_hours"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="kpi-card">
+            <div>Billable Hours</div>
+            <div class="kpi-value text-info">
+                <t t-esc="state.billable_hours"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="kpi-card">
+            <div>Non-Billable</div>
+            <div class="kpi-value text-warning">
+                <t t-esc="state.non_billable_hours"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="kpi-card">
+            <div>Utilization %</div>
+            <div class="kpi-value text-danger">
+                <t t-esc="state.utilization"/> %
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="kpi-card">
+            <div>Departments</div>
+            <div class="kpi-value text-dark">
+                <t t-esc="state.total_departments"/>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CHART SECTION -->
+<div class="row mb-4">
+
+    <div class="col-md-6 mb-3">
+        <div class="chart-card">
+            <div class="section-title">Employee Status</div>
+            <div class="chart-container">
+                <canvas id="employeeStatusChart"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="chart-card">
+            <div class="section-title">Employees by Department</div>
+            <div class="chart-container">
+                <canvas id="departmentChart"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="chart-card">
+            <div class="section-title">Monthly Timesheet Hours</div>
+            <div class="chart-container">
+                <canvas id="monthlyHoursChart"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="chart-card">
+            <div class="section-title">Billable vs Non-Billable</div>
+            <div class="chart-container">
+                <canvas id="billableChart"/>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- TOP EMPLOYEES -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="chart-card">
+            <div class="section-title">Top 5 Employees by Hours</div>
+            <div class="chart-container">
+                <canvas id="topEmployeesChart"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EMPLOYEE TABLE -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-card table-responsive">
+            <div class="section-title">Employee Overview</div>
+
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Job Position</th>
+                        <th>Total Hours</th>
+                        <th>Billable</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <t t-foreach="state.employees" t-as="emp" t-key="emp.id">
+                        <tr>
+                            <td><strong><t t-esc="emp.name"/></strong></td>
+                            <td><t t-esc="emp.department"/></td>
+                            <td><t t-esc="emp.job"/></td>
+                            <td><t t-esc="emp.total_hours"/></td>
+                            <td><t t-esc="emp.billable_hours"/></td>
+                            <td>
+                                <span t-att-class="emp.active ? 'badge badge-active text-white px-3 py-2 rounded-pill' : 'badge badge-inactive text-white px-3 py-2 rounded-pill'">
+                                    <t t-esc="emp.active ? 'Active' : 'Inactive'"/>
+                                </span>
+                            </td>
+                        </tr>
+                    </t>
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+</div>
+</t>
+</templates>
