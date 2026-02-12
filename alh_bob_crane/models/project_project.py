@@ -459,7 +459,7 @@ class EquipmentAllocation(models.Model):
     equipment_id = fields.Many2one(
         'fleet.vehicle',
         string='Equipment',
-        domain="[('type_equipment_id','in',['equipment','lifting','trailers']),('is_available','=',True)]"
+        domain="[('type_equipment_id','in',['equipment','lifting','trailers'])]"
     )
     start_date = fields.Datetime(required=True,
                                  string="Start Date")
