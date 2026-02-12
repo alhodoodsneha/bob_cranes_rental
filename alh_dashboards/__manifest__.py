@@ -21,14 +21,14 @@
 #############################################################################
 {
     'name': 'Dashboards',
-    'version': '19.0.0.0.3',
+    'version': '19.0.0.0.4',
     'category': 'Equipment Rental Management',
     'sequence': 2,
     'website': 'https://www.alhodood.com/',
     'author': 'Alhodood Technologies',
     'summary': 'Equipment Rental Management',
     'description': 'Dashboards',
-    'depends': ['spreadsheet_dashboard'
+    'depends': ['spreadsheet_dashboard','alh_bob_crane'
                 ],
     'data': [
         'security/res_group.xml',
