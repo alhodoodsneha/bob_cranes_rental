@@ -382,12 +382,14 @@ class ProjectDashboard(models.Model):
         }
 
         recent_customers = [{
+            "id": p.id,
             "name": p.name,
             "email": p.email,
             "phone": p.phone
         } for p in partners.sorted(key=lambda r: r.create_date, reverse=True)[:5]]
 
         no_order_customers = [{
+            "id": p.id,
             "name": p.name,
             "email": p.email
         } for p in partners if not orders.filtered(lambda o: o.partner_id == p)][:5]

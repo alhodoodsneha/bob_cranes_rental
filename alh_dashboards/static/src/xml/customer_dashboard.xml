@@ -48,7 +48,7 @@ canvas {
 <!-- KPI ROW -->
 <div class="row mb-4">
 
-    <t t-foreach="state.kpi_cards" t-as="k" t-key="k">
+    <t t-foreach="state.kpi_cards" t-as="k" t-key="k.label">
         <div class="col-md-2 mb-3">
             <div class="dashboard-card text-white" t-att-style="'background:'+k.color">
                 <div class="kpi-number"><t t-esc="k.value"/></div>
@@ -205,7 +205,7 @@ canvas {
                     </tr>
                 </thead>
                 <tbody>
-                    <t t-foreach="state.recent_customers" t-as="c" t-key="c">
+                    <t t-foreach="state.recent_customers" t-as="c" t-key="c.id">
                         <tr>
                             <td><t t-esc="c.name"/></td>
                             <td><t t-esc="c.email"/></td>
@@ -228,7 +228,7 @@ canvas {
                     </tr>
                 </thead>
                 <tbody>
-                    <t t-foreach="state.no_order_customers" t-as="c" t-key="c">
+                    <t t-foreach="state.no_order_customers" t-as="c" t-key="c.id">
                         <tr>
                             <td><t t-esc="c.name"/></td>
                             <td><t t-esc="c.email"/></td>
