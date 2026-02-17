@@ -228,6 +228,9 @@ class Project(models.Model):
             'move_type': 'out_invoice',
             'partner_id': self.partner_id.id,
             'invoice_date': self.date_fixed,
+            'analytic_distribution': {
+                self.account_id.id: 100,
+            },
             'invoice_line_ids': [(0, 0, {
                 'name': self.description_inv,
                 'quantity': 1,
@@ -433,6 +436,9 @@ class InvoiceAllocation(models.Model):
             'move_type': 'out_invoice',
             'partner_id': self.project_id.partner_id.id,
             'invoice_date': today,
+            'analytic_distribution': {
+                self.project_id.account_id.id: 100,
+            },
             'invoice_line_ids': [(0, 0, {
                 'name': f"Rental Invoice - {self.project_id.name}",
                 'quantity': 1,
