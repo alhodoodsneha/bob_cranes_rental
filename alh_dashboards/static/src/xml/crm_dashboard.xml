@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+<t t-name="alh_dashboards.crm_dashboard">
+
+<div class="container-fluid p-4 dashboard-bg">
+
+<style>
+    html, body {
+        height: auto !important;
+        overflow-y: auto !important;
+    }
+    .chart-container {
+    position: relative;
+    height: 320px;
+    width: 100%;
+}
+.dashboard-bg {
+    background: #f4f6f9;
+    min-height: 100vh;
+}
+
+.dashboard-title {
+    font-weight: 600;
+    color: #34495e;
+}
+
+.kpi-card {
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+.kpi-card:hover {
+    transform: translateY(-5px);
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.table-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+</style>
+
+<h2 class="mb-4 dashboard-title">CRM Dashboard</h2>
+
+<!-- KPI ROW -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="kpi-card bg-primary">
+            <div>Total Leads</div>
+            <div class="kpi-value"><t t-esc="state.kpis.total_leads"/></div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="kpi-card bg-success">
+            <div>Opportunities</div>
+            <div class="kpi-value"><t t-esc="state.kpis.opportunities"/></div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="kpi-card bg-warning">
+            <div>Won Deals</div>
+            <div class="kpi-value"><t t-esc="state.kpis.won"/></div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="kpi-card bg-danger">
+            <div>Lost Deals</div>
+            <div class="kpi-value"><t t-esc="state.kpis.lost"/></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CHARTS ROW -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5>Pipeline by Stage</h5>
+            <div class="chart-container">
+                <canvas id="stageChart"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5>Monthly Revenue</h5>
+            <div class="chart-container">
+                <canvas id="revenueChart"/>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- TABLE -->
+<div class="row">
+    <div class="col-12">
+        <div class="table-card">
+            <h5>Top Salespersons</h5>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Total Leads</th>
+                        <th>Won Deals</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="state.top_salespersons" t-as="sp" t-key="sp">
+                        <tr>
+                            <td><t t-esc="sp.name"/></td>
+                            <td><t t-esc="sp.total"/></td>
+                            <td><t t-esc="sp.won"/></td>
+                            <td><t t-esc="sp.revenue"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</div>
+</t>
+</templates>
